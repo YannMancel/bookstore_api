@@ -12,10 +12,10 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column()
+    @Column(nullable = false)
     private String title;
 
-    @ManyToOne()
+    @ManyToOne(optional = false)
     private Author author;
 
     public Book() {}
