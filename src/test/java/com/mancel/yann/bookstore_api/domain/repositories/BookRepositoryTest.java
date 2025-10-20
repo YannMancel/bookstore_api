@@ -1,13 +1,12 @@
 package com.mancel.yann.bookstore_api.domain.repositories;
 
+import com.mancel.yann.bookstore_api.Fixtures;
 import com.mancel.yann.bookstore_api.entities.Book;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
-
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,8 +60,7 @@ class BookRepositoryTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void givenTableIsPopulatedByOneBook_whenFindAllByAuthorIdIsCalled_thenReturnsAListContainingThisBook() {
-        var uuid = UUID.fromString("64f07a63-1c1c-415e-b2c7-6a54860e6083");
-        var books = bookRepository.findAllByAuthorId(uuid);
+        var books = bookRepository.findAllByAuthorId(Fixtures.AUTHOR_UUID);
 
         assertThat(books)
                 .isNotNull()
@@ -79,8 +77,7 @@ class BookRepositoryTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void givenTableIsPopulatedByOneBook_whenFindAllByAuthorIdIsCalled_thenReturnsAnEmptyListIsReturned() {
-        var uuid = UUID.randomUUID();
-        var books = bookRepository.findAllByAuthorId(uuid);
+        var books = bookRepository.findAllByAuthorId(Fixtures.getRandomUUID());
 
         assertThat(books)
                 .isNotNull()
@@ -96,7 +93,7 @@ class BookRepositoryTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void givenTableIsPopulatedByOneBook_whenFindAllByTitleContainingIsCalled_thenReturnsAListContainingThisBook() {
-        var books = bookRepository.findAllByTitleContaining("Horde");
+        var books = bookRepository.findAllByTitleContaining(Fixtures.BOOK_SUBTITLE);
 
         assertThat(books)
                 .isNotNull()
@@ -113,7 +110,7 @@ class BookRepositoryTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void givenTableIsPopulatedByOneBook_whenFindAllByTitleContainingIsCalled_thenReturnsAnEmptyListIsReturned() {
-        var randomSubtitle = UUID.randomUUID().toString();
+        var randomSubtitle = Fixtures.getRandomUUID().toString();
         var books = bookRepository.findAllByTitleContaining(randomSubtitle);
 
         assertThat(books)
@@ -129,8 +126,7 @@ class BookRepositoryTest {
             """)
     @Test
     void givenTableIsEmpty_whenFindByIdIsCalledWithRandomUUID_thenReturnsEmptyOptional() {
-        var uuid = UUID.randomUUID();
-        var bookOptional = bookRepository.findById(uuid);
+        var bookOptional = bookRepository.findById(Fixtures.getRandomUUID());
 
         assertThat(bookOptional)
                 .isNotNull()
@@ -146,8 +142,7 @@ class BookRepositoryTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void givenTableIsPopulatedByOneBook_whenFindByIdIsCalledWithBookUUID_thenReturnsBook() {
-        var uuid = UUID.fromString("1955a2d7-5367-4c63-8323-31ad9bd3db31");
-        var bookOptional = bookRepository.findById(uuid);
+        var bookOptional = bookRepository.findById(Fixtures.BOOK_UUID);
 
         assertThat(bookOptional)
                 .isNotNull()
@@ -164,14 +159,11 @@ class BookRepositoryTest {
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
     void givenTransientAuthor_whenSaveIsCalled_thenPersistenceIsSuccess() {
-        var uuid = UUID.fromString("64f07a63-1c1c-415e-b2c7-6a54860e6083");
         var persistedAuthor = authorRepository
-                .findById(uuid)
+                .findById(Fixtures.AUTHOR_UUID)
                 .orElseThrow();
 
-        var transientBook = new Book(
-                "Berserk",
-                persistedAuthor);
+        var transientBook = Fixtures.getTransientBook(persistedAuthor);
         assertThat(transientBook)
                 .extracting(Book::getId)
                 .isNull();

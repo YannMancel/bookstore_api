@@ -1,5 +1,6 @@
 package com.mancel.yann.bookstore_api.entities;
 
+import com.mancel.yann.bookstore_api.Fixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.text.MessageFormat;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -65,11 +65,10 @@ class BookTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void givenTableIsPopulatedByOneBook_whenFindAllByAuthorIdQueryIsCalled_thenReturnsAListContainingThisBook() {
-        var uuid = UUID.fromString("64f07a63-1c1c-415e-b2c7-6a54860e6083");
         var books = entityManager
                 .getEntityManager()
                 .createQuery("select b from Book b where b.author.id=:authorId", Book.class)
-                .setParameter("authorId", uuid)
+                .setParameter("authorId", Fixtures.AUTHOR_UUID)
                 .getResultList();
 
         assertThat(books)
@@ -88,11 +87,10 @@ class BookTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void givenTableIsPopulatedByOneBook_whenFindAllByAuthorIdQueryIsCalled_thenReturnsAnEmptyListIsReturned() {
-        var uuid = UUID.randomUUID();
         var books = entityManager
                 .getEntityManager()
                 .createQuery("select b from Book b where b.author.id=:authorId", Book.class)
-                .setParameter("authorId", uuid)
+                .setParameter("authorId", Fixtures.getRandomUUID())
                 .getResultList();
 
         assertThat(books)
@@ -110,7 +108,7 @@ class BookTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void givenTableIsPopulatedByOneBook_whenFindAllByTitleContainingQueryIsCalled_thenReturnsAListContainingThisBook() {
-        var randomSubtitle = "%Horde%";
+        var randomSubtitle = MessageFormat.format("%{0}%", Fixtures.BOOK_SUBTITLE);
         var books = entityManager
                 .getEntityManager()
                 .createQuery("select b from Book b where b.title like :title", Book.class)
@@ -133,7 +131,7 @@ class BookTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void givenTableIsPopulatedByOneBook_whenFindAllByTitleContainingQueryIsCalled_thenReturnsAnEmptyListIsReturned() {
-        var randomSubtitle = MessageFormat.format("%{0}%", UUID.randomUUID());
+        var randomSubtitle = MessageFormat.format("%{0}%", Fixtures.getRandomUUID());
         var books = entityManager
                 .getEntityManager()
                 .createQuery("select b from Book b where b.title like :title", Book.class)
@@ -153,8 +151,7 @@ class BookTest {
             """)
     @Test
     void givenTableIsEmpty_whenFindIsCalledWithRandomUUID_thenReturnsNull() {
-        var uuid = UUID.randomUUID();
-        var book = entityManager.find(Book.class, uuid);
+        var book = entityManager.find(Book.class, Fixtures.getRandomUUID());
 
         assertThat(book).isNull();
     }
@@ -168,8 +165,7 @@ class BookTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void givenTableIsPopulatedByOneBook_whenFindIsCalledWithBookUUID_thenReturnsBook() {
-        var uuid = UUID.fromString("1955a2d7-5367-4c63-8323-31ad9bd3db31");
-        var book = entityManager.find(Book.class, uuid);
+        var book = entityManager.find(Book.class, Fixtures.BOOK_UUID);
 
         assertThat(book).isNotNull();
     }
@@ -184,12 +180,9 @@ class BookTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void givenTransientBook_whenPersistIsCalled_thenPersistenceIsSuccess() {
-        var uuid = UUID.fromString("64f07a63-1c1c-415e-b2c7-6a54860e6083");
-        var persistedAuthor = entityManager.find(Author.class, uuid);
+        var persistedAuthor = entityManager.find(Author.class, Fixtures.AUTHOR_UUID);
 
-        var transientBook = new Book(
-                "Berserk",
-                persistedAuthor);
+        var transientBook = Fixtures.getTransientBook(persistedAuthor);
         assertThat(transientBook)
                 .extracting(Book::getId)
                 .isNull();

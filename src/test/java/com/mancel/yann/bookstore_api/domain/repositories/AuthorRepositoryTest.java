@@ -1,14 +1,12 @@
 package com.mancel.yann.bookstore_api.domain.repositories;
 
+import com.mancel.yann.bookstore_api.Fixtures;
 import com.mancel.yann.bookstore_api.entities.Author;
-import org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
-
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -58,8 +56,7 @@ class AuthorRepositoryTest {
             """)
     @Test
     void givenTableIsEmpty_whenFindByIdIsCalledWithRandomUUID_thenReturnsEmptyOptional() {
-        var uuid = UUID.randomUUID();
-        var authorOptional = authorRepository.findById(uuid);
+        var authorOptional = authorRepository.findById(Fixtures.getRandomUUID());
 
         assertThat(authorOptional)
                 .isNotNull()
@@ -75,8 +72,7 @@ class AuthorRepositoryTest {
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
     void givenTableIsPopulatedByOneAuthor_whenFindByIdIsCalledWithAuthorUUID_thenReturnsAuthor() {
-        var uuid = UUID.fromString("64f07a63-1c1c-415e-b2c7-6a54860e6083");
-        var authorOptional = authorRepository.findById(uuid);
+        var authorOptional = authorRepository.findById(Fixtures.AUTHOR_UUID);
 
         assertThat(authorOptional)
                 .isNotNull()
@@ -91,10 +87,7 @@ class AuthorRepositoryTest {
             """)
     @Test
     void givenTransientAuthor_whenSaveIsCalled_thenPersistenceIsSuccess() {
-        var transientAuthor = new Author(
-                "john.doe@gmail.com",
-                "John",
-                "Doe");
+        var transientAuthor = Fixtures.getTransientAuthor();
         assertThat(transientAuthor)
                 .extracting(Author::getId)
                 .isNull();
