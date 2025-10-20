@@ -27,7 +27,7 @@ class AuthorTest {
     void givenTableIsEmpty_whenFindAllQueryIsCalled_thenReturnsEmptyList() {
         var authors = entityManager
                 .getEntityManager()
-                .createQuery("SELECT c FROM Author c", Author.class)
+                .createQuery("select c from Author c", Author.class)
                 .getResultList();
 
         assertThat(authors)
@@ -46,7 +46,7 @@ class AuthorTest {
     void givenTableIsPopulatedByOneAuthor_whenFindAllQueryIsCalled_thenReturnsAListContainingThisAuthor() {
         var authors = entityManager
                 .getEntityManager()
-                .createQuery("SELECT c FROM Author c", Author.class)
+                .createQuery("select c from Author c", Author.class)
                 .getResultList();
 
         assertThat(authors)

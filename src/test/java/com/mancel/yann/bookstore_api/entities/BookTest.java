@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.text.MessageFormat;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +28,7 @@ class BookTest {
     void givenTableIsEmpty_whenFindAllQueryIsCalled_thenReturnsEmptyList() {
         var books = entityManager
                 .getEntityManager()
-                .createQuery("SELECT c FROM Book c", Book.class)
+                .createQuery("select c from Book c", Book.class)
                 .getResultList();
 
         assertThat(books)
@@ -39,14 +40,14 @@ class BookTest {
             """
             Given table is populated by one book
             When a JPQL query is called to find all entities
-            Then a list containing this author
+            Then a list containing this book
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void givenTableIsPopulatedByOneBook_whenFindAllQueryIsCalled_thenReturnsAListContainingThisBook() {
         var books = entityManager
                 .getEntityManager()
-                .createQuery("SELECT c FROM Book c", Book.class)
+                .createQuery("select c from Book c", Book.class)
                 .getResultList();
 
         assertThat(books)
@@ -54,6 +55,95 @@ class BookTest {
                 .isNotEmpty().hasSize(1);
     }
 
+    @DisplayName(
+            """
+            Given table is populated by one book
+            When a JPQL query is called to find all entities
+            And there is a filter on author's UUID of this book
+            Then a list containing this book
+            """)
+    @Test
+    @Sql({"/scripts/insert_one_author_and_one_book.sql"})
+    void givenTableIsPopulatedByOneBook_whenFindAllByAuthorIdQueryIsCalled_thenReturnsAListContainingThisBook() {
+        var uuid = UUID.fromString("64f07a63-1c1c-415e-b2c7-6a54860e6083");
+        var books = entityManager
+                .getEntityManager()
+                .createQuery("select b from Book b where b.author.id=:authorId", Book.class)
+                .setParameter("authorId", uuid)
+                .getResultList();
+
+        assertThat(books)
+                .isNotNull()
+                .isNotEmpty()
+                .hasSize(1);
+    }
+
+    @DisplayName(
+            """
+            Given table is populated by one book
+            When a JPQL query is called to find all entities
+            And there is a filter on author's UUID with random value
+            Then an empty list is returned
+            """)
+    @Test
+    @Sql({"/scripts/insert_one_author_and_one_book.sql"})
+    void givenTableIsPopulatedByOneBook_whenFindAllByAuthorIdQueryIsCalled_thenReturnsAnEmptyListIsReturned() {
+        var uuid = UUID.randomUUID();
+        var books = entityManager
+                .getEntityManager()
+                .createQuery("select b from Book b where b.author.id=:authorId", Book.class)
+                .setParameter("authorId", uuid)
+                .getResultList();
+
+        assertThat(books)
+                .isNotNull()
+                .isEmpty();
+    }
+
+    @DisplayName(
+            """
+            Given table is populated by one book
+            When a JPQL query is called to find all entities
+            And there is a filter on book's title with a subtitle of book's title
+            Then a list containing this book
+            """)
+    @Test
+    @Sql({"/scripts/insert_one_author_and_one_book.sql"})
+    void givenTableIsPopulatedByOneBook_whenFindAllByTitleContainingQueryIsCalled_thenReturnsAListContainingThisBook() {
+        var randomSubtitle = "%Horde%";
+        var books = entityManager
+                .getEntityManager()
+                .createQuery("select b from Book b where b.title like :title", Book.class)
+                .setParameter("title", randomSubtitle)
+                .getResultList();
+
+        assertThat(books)
+                .isNotNull()
+                .isNotEmpty()
+                .hasSize(1);
+    }
+
+    @DisplayName(
+            """
+            Given table is populated by one book
+            When a JPQL query is called to find all entities
+            And there is a filter on book's title with a random subtitle
+            Then an empty list is returned
+            """)
+    @Test
+    @Sql({"/scripts/insert_one_author_and_one_book.sql"})
+    void givenTableIsPopulatedByOneBook_whenFindAllByTitleContainingQueryIsCalled_thenReturnsAnEmptyListIsReturned() {
+        var randomSubtitle = MessageFormat.format("%{0}%", UUID.randomUUID());
+        var books = entityManager
+                .getEntityManager()
+                .createQuery("select b from Book b where b.title like :title", Book.class)
+                .setParameter("title", randomSubtitle)
+                .getResultList();
+
+        assertThat(books)
+                .isNotNull()
+                .isEmpty();
+    }
 
     @DisplayName(
             """

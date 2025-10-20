@@ -12,6 +12,10 @@ public interface BookRepository {
 
     List<Book> findAll();
 
+    List<Book> findAllByAuthorId(UUID authorId);
+
+    List<Book> findAllByTitleContaining(String subtitle);
+
     Optional<Book> findById(UUID id);
 
     Book save(Book entity);

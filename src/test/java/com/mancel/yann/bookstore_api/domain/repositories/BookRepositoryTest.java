@@ -54,6 +54,75 @@ class BookRepositoryTest {
 
     @DisplayName(
             """
+            Given table is populated by one book
+            When findAllByAuthorId method is called with author's UUID of this book
+            Then a list containing this book
+            """)
+    @Test
+    @Sql({"/scripts/insert_one_author_and_one_book.sql"})
+    void givenTableIsPopulatedByOneBook_whenFindAllByAuthorIdIsCalled_thenReturnsAListContainingThisBook() {
+        var uuid = UUID.fromString("64f07a63-1c1c-415e-b2c7-6a54860e6083");
+        var books = bookRepository.findAllByAuthorId(uuid);
+
+        assertThat(books)
+                .isNotNull()
+                .isNotEmpty()
+                .hasSize(1);
+    }
+
+    @DisplayName(
+            """
+            Given table is populated by one book
+            When findAllByAuthorId method is called with a random UUID
+            Then an empty list is returned
+            """)
+    @Test
+    @Sql({"/scripts/insert_one_author_and_one_book.sql"})
+    void givenTableIsPopulatedByOneBook_whenFindAllByAuthorIdIsCalled_thenReturnsAnEmptyListIsReturned() {
+        var uuid = UUID.randomUUID();
+        var books = bookRepository.findAllByAuthorId(uuid);
+
+        assertThat(books)
+                .isNotNull()
+                .isEmpty();
+    }
+
+    @DisplayName(
+            """
+            Given table is populated by one book
+            When findAllByTitleContaining method is called with a subtitle of book's title
+            Then a list containing this book
+            """)
+    @Test
+    @Sql({"/scripts/insert_one_author_and_one_book.sql"})
+    void givenTableIsPopulatedByOneBook_whenFindAllByTitleContainingIsCalled_thenReturnsAListContainingThisBook() {
+        var books = bookRepository.findAllByTitleContaining("Horde");
+
+        assertThat(books)
+                .isNotNull()
+                .isNotEmpty()
+                .hasSize(1);
+    }
+
+    @DisplayName(
+            """
+            Given table is populated by one book
+            When findAllByTitleContaining method is called with a random subtitle
+            Then an empty list is returned
+            """)
+    @Test
+    @Sql({"/scripts/insert_one_author_and_one_book.sql"})
+    void givenTableIsPopulatedByOneBook_whenFindAllByTitleContainingIsCalled_thenReturnsAnEmptyListIsReturned() {
+        var randomSubtitle = UUID.randomUUID().toString();
+        var books = bookRepository.findAllByTitleContaining(randomSubtitle);
+
+        assertThat(books)
+                .isNotNull()
+                .isEmpty();
+    }
+
+    @DisplayName(
+            """
             Given table is empty
             When findById method is called with a random UUID
             Then empty optional is returned
