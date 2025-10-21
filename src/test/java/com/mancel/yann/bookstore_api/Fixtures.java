@@ -1,5 +1,6 @@
 package com.mancel.yann.bookstore_api;
 
+import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
 import com.mancel.yann.bookstore_api.entities.Author;
 import com.mancel.yann.bookstore_api.entities.Book;
 
@@ -17,11 +18,28 @@ public class Fixtures {
 
     public static final String BOOK_SUBTITLE = "Horde";
 
+    public static AuthorCreationRequest getInvalidAuthorCreationRequest() {
+        return new AuthorCreationRequest(
+                "john.doe@gmail.com",
+                null, // firstName must be not null to be valid
+                "Doe");
+    }
+
+    public static AuthorCreationRequest getValidAuthorCreationRequest() {
+        return new AuthorCreationRequest(
+                "john.doe@gmail.com",
+                "John",
+                "Doe");
+    }
+
     public static Author getTransientAuthor() {
-        return new Author(
-            "john.doe@gmail.com",
-            "John",
-            "Doe");
+        return getValidAuthorCreationRequest().convertToAuthor();
+    }
+
+    public static Author getPersistedAuthor() {
+        var transientAuthor = getTransientAuthor();
+        transientAuthor.setId(AUTHOR_UUID);
+        return transientAuthor;
     }
 
     public static Book getTransientBook(Author author) {
