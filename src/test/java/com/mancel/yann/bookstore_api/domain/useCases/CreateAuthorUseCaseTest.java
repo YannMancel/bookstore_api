@@ -49,7 +49,7 @@ class CreateAuthorUseCaseTest extends MockInjectorTestBase {
             """
             Given an invalid author creation request
             When execute method is called
-            Then ValidationException is thrown
+            Then a ValidationException is thrown
             """)
     @Test
     void givenAnInvalidAuthorCreationRequest_whenExecuteIsCalled_thenValidationExceptionIsThrown() {

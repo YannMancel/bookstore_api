@@ -1,6 +1,7 @@
 package com.mancel.yann.bookstore_api.domain.exceptions;
 
-public class ValidationException extends Exception {
+public final class ValidationException extends DomainException {
+
     public ValidationException(String message) {
         super(message);
     }
