@@ -1,31 +1,50 @@
 package com.mancel.yann.bookstore_api.domain.useCases;
 
 import com.mancel.yann.bookstore_api.Fixtures;
-import com.mancel.yann.bookstore_api.MockInjectorTestBase;
+import com.mancel.yann.bookstore_api.mocks.MockInjectorTestBase;
 import com.mancel.yann.bookstore_api.domain.delegates.ThrowableSupplier;
 import com.mancel.yann.bookstore_api.domain.exceptions.ValidationException;
 import com.mancel.yann.bookstore_api.domain.delegates.TransactionDelegate;
 import com.mancel.yann.bookstore_api.domain.repositories.AuthorRepository;
+import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
 import com.mancel.yann.bookstore_api.mocks.FakeTransactionDelegate;
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.*;
 
+import java.util.stream.Stream;
+
 import static org.assertj.core.api.BDDAssertions.catchThrowable;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 
 @SuppressWarnings("unchecked")
 class CreateAuthorUseCaseTest extends MockInjectorTestBase {
 
     @Mock
-    private AuthorRepository mockedAuthorRepository;
+    AuthorRepository mockedAuthorRepository;
 
     @Spy
-    private TransactionDelegate fakeTransactionDelegate = new FakeTransactionDelegate();
+    TransactionDelegate fakeTransactionDelegate = new FakeTransactionDelegate();
 
     @InjectMocks
-    private CreateAuthorUseCase createAuthorUseCase;
+    CreateAuthorUseCase createAuthorUseCase;
+
+    static Stream<Arguments> invalidAuthorCreationRequestGenerator() {
+        return Stream.of(
+                arguments(
+                        Fixtures.getInvalidAuthorCreationRequest(true, false),
+                        "First name is required."),
+                arguments(Fixtures.getInvalidAuthorCreationRequest(false, true),
+                        "Last name is required."),
+                arguments(Fixtures.getInvalidAuthorCreationRequest(true, true),
+                        "First name is required.Last name is required.")
+        );
+    }
 
     @DisplayName(
             """
@@ -63,9 +82,11 @@ class CreateAuthorUseCaseTest extends MockInjectorTestBase {
             And no persistence is performed
             And a ValidationException is thrown
             """)
-    @Test
-    void givenAnInvalidAuthorCreationRequest_whenExecuteIsCalled_thenValidationExceptionIsThrown() {
-        var authorCreationRequest = Fixtures.getInvalidAuthorCreationRequest();
+    @ParameterizedTest
+    @MethodSource("invalidAuthorCreationRequestGenerator")
+    void givenAnInvalidAuthorCreationRequest_whenExecuteIsCalled_thenValidationExceptionIsThrown(
+            AuthorCreationRequest  authorCreationRequest,
+            String errorMessage) {
 
         var thrown = catchThrowable(() -> createAuthorUseCase.execute(authorCreationRequest));
 
@@ -76,7 +97,7 @@ class CreateAuthorUseCaseTest extends MockInjectorTestBase {
                 .shouldHaveNoInteractions();
         BDDAssertions.then(thrown)
                 .isExactlyInstanceOf(ValidationException.class)
-                .hasMessageContaining("The request's firstName is null.");
+                .hasMessageContaining(errorMessage);
     }
 
     @DisplayName(

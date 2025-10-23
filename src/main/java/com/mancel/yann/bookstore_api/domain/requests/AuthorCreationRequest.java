@@ -17,8 +17,8 @@ public record AuthorCreationRequest(String email,
     public void validOrThrow() throws ValidationException {
         if (firstName == null || lastName == null) {
             var builder = new StringBuilder("Invalid entity: ");
-            if (firstName == null) builder.append("The request's firstName is null.");
-            if (lastName == null) builder.append("The request's lastName is null.");
+            if (firstName == null) builder.append("First name is required.");
+            if (lastName == null) builder.append("Last name is required.");
             throw new ValidationException(builder.toString());
         }
     }

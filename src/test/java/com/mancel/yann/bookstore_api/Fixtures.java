@@ -18,18 +18,20 @@ public class Fixtures {
 
     public static final String BOOK_SUBTITLE = "Horde";
 
-    public static AuthorCreationRequest getInvalidAuthorCreationRequest() {
-        return new AuthorCreationRequest(
-                "john.doe@gmail.com",
-                null, // firstName must be not null to be valid
-                "Doe");
-    }
-
     public static AuthorCreationRequest getValidAuthorCreationRequest() {
         return new AuthorCreationRequest(
                 "john.doe@gmail.com",
                 "John",
                 "Doe");
+    }
+
+    public static AuthorCreationRequest getInvalidAuthorCreationRequest(boolean hasNullFirstName,
+                                                                        boolean hasNullLastName) {
+        var validAuthorCreationRequest = getValidAuthorCreationRequest();
+        return new AuthorCreationRequest(
+                "john.doe@gmail.com",
+                hasNullFirstName ? null : validAuthorCreationRequest.firstName(),
+                hasNullLastName ? null : validAuthorCreationRequest.lastName());
     }
 
     public static Author getTransientAuthor() {
