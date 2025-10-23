@@ -5,7 +5,7 @@ import com.mancel.yann.bookstore_api.entities.Author;
 
 public record AuthorCreationRequest(String email,
                                     String firstName,
-                                    String lastName) {
+                                    String lastName) implements Request {
 
     public Author convertToAuthor() {
         return new Author(

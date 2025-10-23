@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface JpaAuthorRepository extends AuthorRepository, ListCrudRepository<Author, UUID> {
-}
+public interface JpaAuthorRepository extends AuthorRepository,
+                                             AuthorPersistRepository,
+                                             ListCrudRepository<Author, UUID> { }

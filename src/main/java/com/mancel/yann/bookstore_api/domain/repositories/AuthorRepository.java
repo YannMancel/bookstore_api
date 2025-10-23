@@ -1,14 +1,13 @@
 package com.mancel.yann.bookstore_api.domain.repositories;
 
+import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
 import com.mancel.yann.bookstore_api.entities.Author;
-import org.springframework.data.repository.NoRepositoryBean;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@NoRepositoryBean
-public interface AuthorRepository {
+public interface AuthorRepository extends PersistRepository<Author, AuthorCreationRequest> {
 
     List<Author> findAll();
 
