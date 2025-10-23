@@ -3,10 +3,15 @@ package com.mancel.yann.bookstore_api.domain.requests;
 import com.mancel.yann.bookstore_api.domain.exceptions.ValidationException;
 import com.mancel.yann.bookstore_api.entities.Author;
 
-public record AuthorCreationRequest(String email, String firstName, String lastName) {
+public record AuthorCreationRequest(String email,
+                                    String firstName,
+                                    String lastName) {
 
     public Author convertToAuthor() {
-        return new Author(email, firstName, lastName);
+        return new Author(
+                email,
+                firstName,
+                lastName);
     }
 
     public void validOrThrow() throws ValidationException {
