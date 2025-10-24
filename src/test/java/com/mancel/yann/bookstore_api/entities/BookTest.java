@@ -10,7 +10,8 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.text.MessageFormat;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssumptions.given;
 
 @DataJpaTest
 class BookTest {
@@ -20,9 +21,9 @@ class BookTest {
 
     @DisplayName(
             """
-            Given table is empty
+            Given the books table is empty
             When a JPQL query is called to find all entities
-            Then empty list is returned
+            Then an empty book list is returned
             """)
     @Test
     void givenTableIsEmpty_whenFindAllQueryIsCalled_thenReturnsEmptyList() {
@@ -31,16 +32,17 @@ class BookTest {
                 .createQuery("select c from Book c", Book.class)
                 .getResultList();
 
-        assertThat(books)
+        then(books)
                 .isNotNull()
                 .isEmpty();
     }
 
     @DisplayName(
             """
-            Given table is populated by one book
+            Given the books table is populated by one book
             When a JPQL query is called to find all entities
-            Then a list containing this book
+            Then a book list is returned
+            And it contains this book
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
@@ -50,17 +52,22 @@ class BookTest {
                 .createQuery("select c from Book c", Book.class)
                 .getResultList();
 
-        assertThat(books)
+        then(books)
                 .isNotNull()
-                .isNotEmpty().hasSize(1);
+                .isNotEmpty()
+                .hasSize(1)
+                .element(0)
+                    .extracting(Book::getId)
+                        .isEqualTo(Fixtures.BOOK_UUID);
     }
 
     @DisplayName(
             """
-            Given table is populated by one book
+            Given the books table is populated by one book
             When a JPQL query is called to find all entities
             And there is a filter on author's UUID of this book
-            Then a list containing this book
+            Then a book list is returned
+            And it contains this book
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
@@ -71,18 +78,21 @@ class BookTest {
                 .setParameter("authorId", Fixtures.AUTHOR_UUID)
                 .getResultList();
 
-        assertThat(books)
+        then(books)
                 .isNotNull()
                 .isNotEmpty()
-                .hasSize(1);
+                .hasSize(1)
+                .element(0)
+                    .extracting(Book::getId)
+                        .isEqualTo(Fixtures.BOOK_UUID);
     }
 
     @DisplayName(
             """
-            Given table is populated by one book
+            Given the books table is populated by one book
             When a JPQL query is called to find all entities
-            And there is a filter on author's UUID with random value
-            Then an empty list is returned
+            And there is a filter on author's UUID with a random value
+            Then an empty book list is returned
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
@@ -93,17 +103,18 @@ class BookTest {
                 .setParameter("authorId", Fixtures.getRandomUUID())
                 .getResultList();
 
-        assertThat(books)
+        then(books)
                 .isNotNull()
                 .isEmpty();
     }
 
     @DisplayName(
             """
-            Given table is populated by one book
+            Given the books table is populated by one book
             When a JPQL query is called to find all entities
             And there is a filter on book's title with a subtitle of book's title
-            Then a list containing this book
+            Then a book list is returned
+            And it contains this book
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
@@ -115,18 +126,21 @@ class BookTest {
                 .setParameter("title", randomSubtitle)
                 .getResultList();
 
-        assertThat(books)
+        then(books)
                 .isNotNull()
                 .isNotEmpty()
-                .hasSize(1);
+                .hasSize(1)
+                .element(0)
+                    .extracting(Book::getId)
+                        .isEqualTo(Fixtures.BOOK_UUID);
     }
 
     @DisplayName(
             """
-            Given table is populated by one book
+            Given the books table is populated by one book
             When a JPQL query is called to find all entities
             And there is a filter on book's title with a random subtitle
-            Then an empty list is returned
+            Then an empty book list is returned
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
@@ -138,28 +152,28 @@ class BookTest {
                 .setParameter("title", randomSubtitle)
                 .getResultList();
 
-        assertThat(books)
+        then(books)
                 .isNotNull()
                 .isEmpty();
     }
 
     @DisplayName(
             """
-            Given table is empty
-            When find method is called with a random UUID
+            Given the books table is empty
+            When the find method is called with a random UUID
             Then null is returned
             """)
     @Test
     void givenTableIsEmpty_whenFindIsCalledWithRandomUUID_thenReturnsNull() {
         var book = entityManager.find(Book.class, Fixtures.getRandomUUID());
 
-        assertThat(book).isNull();
+        then(book).isNull();
     }
 
     @DisplayName(
             """
-            Given table is populated by one book
-            When find method is called with the book's UUID
+            Given the books table is populated by one book
+            When the find method is called with the book's UUID
             Then this book is returned
             """)
     @Test
@@ -167,15 +181,19 @@ class BookTest {
     void givenTableIsPopulatedByOneBook_whenFindIsCalledWithBookUUID_thenReturnsBook() {
         var book = entityManager.find(Book.class, Fixtures.BOOK_UUID);
 
-        assertThat(book).isNotNull();
+        then(book)
+                .isNotNull()
+                .extracting(Book::getId)
+                    .isEqualTo(Fixtures.BOOK_UUID);
     }
 
     @DisplayName(
             """
-            Given an author is persisted
-            And a transient book
-            When persist method is called
+            Given there is a persisted author
+            And there is a transient book
+            When the persist method is called
             Then the persistence is success
+            And the persisted book is return
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
@@ -183,16 +201,16 @@ class BookTest {
         var persistedAuthor = entityManager.find(Author.class, Fixtures.AUTHOR_UUID);
 
         var transientBook = Fixtures.getTransientBook(persistedAuthor);
-        assertThat(transientBook)
+        given(transientBook)
                 .extracting(Book::getId)
-                .isNull();
+                    .isNull();
 
         var persistedBook = entityManager.persist(transientBook);
 
-        assertThat(transientBook)
+        then(transientBook)
                 .isEqualTo(persistedBook)
                 .isEqualTo(entityManager.find(Book.class, persistedBook.getId()))
                 .extracting(Book::getId)
-                .isNotNull();
+                    .isNotNull();
     }
 }

@@ -1,7 +1,7 @@
 package com.mancel.yann.bookstore_api.domain.useCases;
 
 import com.mancel.yann.bookstore_api.Fixtures;
-import com.mancel.yann.bookstore_api.mocks.MockInjectorTestBase;
+import com.mancel.yann.bookstore_api.mocks.MockInjectorTest;
 import com.mancel.yann.bookstore_api.domain.delegates.ThrowableSupplier;
 import com.mancel.yann.bookstore_api.domain.exceptions.ValidationException;
 import com.mancel.yann.bookstore_api.domain.delegates.TransactionDelegate;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 
 @SuppressWarnings("unchecked")
-class CreateAuthorUseCaseTest extends MockInjectorTestBase {
+class CreateAuthorUseCaseTest extends MockInjectorTest {
 
     @Mock
     AuthorRepository mockedAuthorRepository;
@@ -71,7 +71,8 @@ class CreateAuthorUseCaseTest extends MockInjectorTestBase {
                 .save(transientAuthor);
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
-        BDDAssertions.then(persistedAuthor).isEqualTo(Fixtures.getPersistedAuthor());
+        BDDAssertions.then(persistedAuthor)
+                .isEqualTo(Fixtures.getPersistedAuthor());
     }
 
     @DisplayName(

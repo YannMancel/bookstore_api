@@ -7,12 +7,18 @@ import org.assertj.core.api.Condition;
 import org.hibernate.PropertyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.stream.Stream;
+
 import static org.assertj.core.api.BDDAssertions.catchThrowable;
 import static org.assertj.core.api.BDDAssertions.then;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @DataJpaTest
 class AuthorPersistRepositoryTest {
@@ -31,7 +37,7 @@ class AuthorPersistRepositoryTest {
     @DisplayName(
             """
             Given there is a valid author creation request
-            When saveFromRequest method is called
+            When the saveFromRequest method is called
             Then the persistence is success
             And the persisted author is returned
             """)
@@ -50,24 +56,36 @@ class AuthorPersistRepositoryTest {
                     .isNotNull();
     }
 
+    static Stream<Arguments> invalidAuthorCreationRequestGenerator() {
+        return Stream.of(
+                arguments(
+                        Fixtures.getInvalidAuthorCreationRequest(true, false),
+                        "^not-null property references a null or transient value.*Author.firstName$"),
+                arguments(Fixtures.getInvalidAuthorCreationRequest(false, true),
+                        "^not-null property references a null or transient value.*Author.lastName$"),
+                arguments(Fixtures.getInvalidAuthorCreationRequest(true, true),
+                        "^not-null property references a null or transient value.*Author.firstName$")
+        );
+    }
+
     @DisplayName(
             """
             Given there is a invalid author creation request
-            When saveFromRequest method is called
+            When the saveFromRequest method is called
             Then the persistence is fail
             And a PropertyValueException is thrown
             """)
-    @Test
-    void givenAInvalidAuthorCreationRequest_whenSaveFromRequestIsCalled_thenPersistenceIsFail() {
-        var authorCreationRequest = Fixtures.getInvalidAuthorCreationRequest(true, false);
-
+    @ParameterizedTest
+    @MethodSource("invalidAuthorCreationRequestGenerator")
+    void givenAInvalidAuthorCreationRequest_whenSaveFromRequestIsCalled_thenPersistenceIsFail(
+            AuthorCreationRequest  authorCreationRequest,
+            String regex
+    ) {
         var thrown = catchThrowable(() -> authorPersistRepository.saveFromRequest(authorCreationRequest));
 
         then(thrown)
                 .isExactlyInstanceOf(PropertyValueException.class)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContainingAll(
-                        "not-null property references a null or transient value",
-                        "Author.firstName");
+                .hasMessageMatching(regex);
     }
 }
