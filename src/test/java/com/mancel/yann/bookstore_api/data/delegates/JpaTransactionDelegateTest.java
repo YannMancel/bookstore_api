@@ -23,7 +23,7 @@ class JpaTransactionDelegateTest {
             Then the correct result is returned
             """)
     @Test
-    void givenThrowingCallback_whenExecuteIntoTransactionIsCalled_thenResultIsReturned() throws DomainException {
+    void test1() throws DomainException {
         var uuid = Fixtures.getRandomUUID();
 
         var result = jpaTransactionDelegate.executeIntoTransaction(() -> uuid);
@@ -40,7 +40,7 @@ class JpaTransactionDelegateTest {
             And its cause is the callback's exception
             """)
     @Test
-    void givenExceptionIsThrown_whenExecuteIntoTransactionIsCalled_thenUnknownExceptionIsThrown() {
+    void test2() {
         var exception = new ArithmeticException();
         given(exception)
                 .isInstanceOf(Exception.class)
@@ -65,7 +65,7 @@ class JpaTransactionDelegateTest {
             Then this exception is rethrown
             """)
     @Test
-    void givenDomainExceptionIsThrown_whenExecuteIntoTransactionIsCalled_thenThisIsRethrown() {
+    void test3() {
         var exception = new ValidationException("");
         given(exception).isInstanceOf(DomainException.class);
 

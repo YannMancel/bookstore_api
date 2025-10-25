@@ -24,7 +24,7 @@ class AuthorRepositoryTest {
             Then an empty author list is returned
             """)
     @Test
-    void givenTableIsEmpty_whenFindAllIsCalled_thenReturnsEmptyList() {
+    void test1() {
         var authors = authorRepository.findAll();
 
         then(authors)
@@ -41,7 +41,7 @@ class AuthorRepositoryTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
-    void givenTableIsPopulatedByOneAuthor_whenFindAllIsCalled_thenReturnsAListContainingThisAuthor() {
+    void test2() {
         var authors = authorRepository.findAll();
 
         then(authors)
@@ -60,7 +60,7 @@ class AuthorRepositoryTest {
             Then an empty author optional is returned
             """)
     @Test
-    void givenTableIsEmpty_whenFindByIdIsCalledWithRandomUUID_thenReturnsEmptyOptional() {
+    void test3() {
         var authorOptional = authorRepository.findById(Fixtures.getRandomUUID());
 
         then(authorOptional)
@@ -77,7 +77,7 @@ class AuthorRepositoryTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
-    void givenTableIsPopulatedByOneAuthor_whenFindByIdIsCalledWithAuthorUUID_thenReturnsAuthor() {
+    void test4() {
         var authorOptional = authorRepository.findById(Fixtures.AUTHOR_UUID);
 
         then(authorOptional)
@@ -96,7 +96,7 @@ class AuthorRepositoryTest {
             And the persisted author is return
             """)
     @Test
-    void givenTransientAuthor_whenSaveIsCalled_thenPersistenceIsSuccess() {
+    void test5() {
         var transientAuthor = Fixtures.getTransientAuthor();
         given(transientAuthor)
                 .extracting(Author::getId)

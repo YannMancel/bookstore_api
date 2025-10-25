@@ -34,28 +34,16 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
     @InjectMocks
     CreateAuthorUseCase createAuthorUseCase;
 
-    static Stream<Arguments> invalidAuthorCreationRequestGenerator() {
-        return Stream.of(
-                arguments(
-                        Fixtures.getInvalidAuthorCreationRequest(true, false),
-                        "First name is required."),
-                arguments(Fixtures.getInvalidAuthorCreationRequest(false, true),
-                        "Last name is required."),
-                arguments(Fixtures.getInvalidAuthorCreationRequest(true, true),
-                        "First name is required.Last name is required.")
-        );
-    }
-
     @DisplayName(
             """
             Given there is a valid author creation request
             And the persistence will be success
-            When execute method is called
+            When the execute method is called
             Then the method is executed into transaction
             And the persisted author is returned
             """)
     @Test
-    void givenAValidAuthorCreationRequest_whenExecuteIsCalled_thenPersistenceIsSuccess() throws ValidationException {
+    void test1() throws ValidationException {
         var authorCreationRequest = Fixtures.getValidAuthorCreationRequest();
         var transientAuthor = authorCreationRequest.convertToAuthor();
         BDDMockito.given(mockedAuthorRepository.save(transientAuthor))
@@ -75,17 +63,29 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
                 .isEqualTo(Fixtures.getPersistedAuthor());
     }
 
+    static Stream<Arguments> invalidAuthorCreationRequestGenerator() {
+        return Stream.of(
+                arguments(
+                        Fixtures.getInvalidAuthorCreationRequest(true, false),
+                        "First name is required."),
+                arguments(Fixtures.getInvalidAuthorCreationRequest(false, true),
+                        "Last name is required."),
+                arguments(Fixtures.getInvalidAuthorCreationRequest(true, true),
+                        "First name is required.Last name is required.")
+        );
+    }
+
     @DisplayName(
             """
             Given there is an invalid author creation request
-            When execute method is called
+            When the execute method is called
             Then the method is executed into transaction
             And no persistence is performed
             And a ValidationException is thrown
             """)
     @ParameterizedTest
     @MethodSource("invalidAuthorCreationRequestGenerator")
-    void givenAnInvalidAuthorCreationRequest_whenExecuteIsCalled_thenValidationExceptionIsThrown(
+    void test2(
             AuthorCreationRequest  authorCreationRequest,
             String errorMessage) {
 
@@ -105,12 +105,12 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
             """
             Given a valid author creation request
             And the persistence will be fail
-            When execute method is called
+            When the execute method is called
             Then the method is executed into transaction
             And null is returned
             """)
     @Test
-    void givenAValidAuthorCreationRequest_whenExecuteIsCalled_thenNullIsReturned() throws ValidationException {
+    void test3() throws ValidationException {
         var authorCreationRequest = Fixtures.getValidAuthorCreationRequest();
         var transientAuthor = authorCreationRequest.convertToAuthor();
         BDDMockito.given(mockedAuthorRepository.save(transientAuthor))

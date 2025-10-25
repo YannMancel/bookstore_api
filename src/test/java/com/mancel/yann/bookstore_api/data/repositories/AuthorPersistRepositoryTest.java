@@ -42,7 +42,7 @@ class AuthorPersistRepositoryTest {
             And the persisted author is returned
             """)
     @Test
-    void givenAValidAuthorCreationRequest_whenSaveFromRequestIsCalled_thenPersistenceIsSuccess() {
+    void test1() {
         var authorCreationRequest = Fixtures.getValidAuthorCreationRequest();
 
         var persistedAuthor = authorPersistRepository.saveFromRequest(authorCreationRequest);
@@ -77,7 +77,7 @@ class AuthorPersistRepositoryTest {
             """)
     @ParameterizedTest
     @MethodSource("invalidAuthorCreationRequestGenerator")
-    void givenAInvalidAuthorCreationRequest_whenSaveFromRequestIsCalled_thenPersistenceIsFail(
+    void test2(
             AuthorCreationRequest  authorCreationRequest,
             String regex
     ) {

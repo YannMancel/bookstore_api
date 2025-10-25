@@ -27,7 +27,7 @@ class BookRepositoryTest {
             Then an empty book list is returned
             """)
     @Test
-    void givenTableIsEmpty_whenFindAllIsCalled_thenReturnsEmptyList() {
+    void test1() {
         var books = bookRepository.findAll();
 
         then(books)
@@ -44,7 +44,7 @@ class BookRepositoryTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
-    void givenTableIsPopulatedByOneBook_whenFindAllIsCalled_thenReturnsAListContainingThisBook() {
+    void test2() {
         var books = bookRepository.findAll();
 
         then(books)
@@ -65,7 +65,7 @@ class BookRepositoryTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
-    void givenTableIsPopulatedByOneBook_whenFindAllByAuthorIdIsCalled_thenReturnsAListContainingThisBook() {
+    void test3() {
         var books = bookRepository.findAllByAuthorId(Fixtures.AUTHOR_UUID);
 
         then(books)
@@ -85,7 +85,7 @@ class BookRepositoryTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
-    void givenTableIsPopulatedByOneBook_whenFindAllByAuthorIdIsCalled_thenReturnsAnEmptyListIsReturned() {
+    void test4() {
         var books = bookRepository.findAllByAuthorId(Fixtures.getRandomUUID());
 
         then(books)
@@ -102,7 +102,7 @@ class BookRepositoryTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
-    void givenTableIsPopulatedByOneBook_whenFindAllByTitleContainingIsCalled_thenReturnsAListContainingThisBook() {
+    void test5() {
         var books = bookRepository.findAllByTitleContaining(Fixtures.BOOK_SUBTITLE);
 
         then(books)
@@ -122,7 +122,7 @@ class BookRepositoryTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
-    void givenTableIsPopulatedByOneBook_whenFindAllByTitleContainingIsCalled_thenReturnsAnEmptyListIsReturned() {
+    void test6() {
         var randomSubtitle = Fixtures.getRandomUUID().toString();
 
         var books = bookRepository.findAllByTitleContaining(randomSubtitle);
@@ -139,7 +139,7 @@ class BookRepositoryTest {
             Then an empty optional is returned
             """)
     @Test
-    void givenTableIsEmpty_whenFindByIdIsCalledWithRandomUUID_thenReturnsEmptyOptional() {
+    void test7() {
         var bookOptional = bookRepository.findById(Fixtures.getRandomUUID());
 
         then(bookOptional)
@@ -156,7 +156,7 @@ class BookRepositoryTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
-    void givenTableIsPopulatedByOneBook_whenFindByIdIsCalledWithBookUUID_thenReturnsBook() {
+    void test8() {
         var bookOptional = bookRepository.findById(Fixtures.BOOK_UUID);
 
         then(bookOptional)
@@ -177,7 +177,7 @@ class BookRepositoryTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
-    void givenTransientAuthor_whenSaveIsCalled_thenPersistenceIsSuccess() {
+    void test9() {
         var persistedAuthor = authorRepository
                 .findById(Fixtures.AUTHOR_UUID)
                 .orElseThrow();

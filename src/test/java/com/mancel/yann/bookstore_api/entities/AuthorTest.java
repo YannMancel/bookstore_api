@@ -24,7 +24,7 @@ class AuthorTest {
             Then an empty author list is returned
             """)
     @Test
-    void givenTableIsEmpty_whenFindAllQueryIsCalled_thenReturnsEmptyList() {
+    void test1() {
         var authors = entityManager
                 .getEntityManager()
                 .createQuery("select c from Author c", Author.class)
@@ -44,7 +44,7 @@ class AuthorTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
-    void givenTableIsPopulatedByOneAuthor_whenFindAllQueryIsCalled_thenReturnsAListContainingThisAuthor() {
+    void test2() {
         var authors = entityManager
                 .getEntityManager()
                 .createQuery("select c from Author c", Author.class)
@@ -66,7 +66,7 @@ class AuthorTest {
             Then null is returned
             """)
     @Test
-    void givenTableIsEmpty_whenFindIsCalledWithRandomUUID_thenReturnsNull() {
+    void test3() {
         var author = entityManager.find(Author.class, Fixtures.getRandomUUID());
 
         then(author).isNull();
@@ -80,7 +80,7 @@ class AuthorTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
-    void givenTableIsPopulatedByOneAuthor_whenFindIsCalledWithAuthorUUID_thenReturnsAuthor() {
+    void test4() {
         var author = entityManager.find(Author.class, Fixtures.AUTHOR_UUID);
 
         then(author)
@@ -97,7 +97,7 @@ class AuthorTest {
             And the persisted author is return
             """)
     @Test
-    void givenTransientAuthor_whenPersistIsCalled_thenPersistenceIsSuccess() {
+    void test5() {
         var transientAuthor = Fixtures.getTransientAuthor();
         given(transientAuthor)
                 .extracting(Author::getId)

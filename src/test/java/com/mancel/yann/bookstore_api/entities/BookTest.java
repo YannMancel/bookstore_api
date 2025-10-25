@@ -26,7 +26,7 @@ class BookTest {
             Then an empty book list is returned
             """)
     @Test
-    void givenTableIsEmpty_whenFindAllQueryIsCalled_thenReturnsEmptyList() {
+    void test1() {
         var books = entityManager
                 .getEntityManager()
                 .createQuery("select c from Book c", Book.class)
@@ -46,7 +46,7 @@ class BookTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
-    void givenTableIsPopulatedByOneBook_whenFindAllQueryIsCalled_thenReturnsAListContainingThisBook() {
+    void test2() {
         var books = entityManager
                 .getEntityManager()
                 .createQuery("select c from Book c", Book.class)
@@ -71,7 +71,7 @@ class BookTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
-    void givenTableIsPopulatedByOneBook_whenFindAllByAuthorIdQueryIsCalled_thenReturnsAListContainingThisBook() {
+    void test3() {
         var books = entityManager
                 .getEntityManager()
                 .createQuery("select b from Book b where b.author.id=:authorId", Book.class)
@@ -96,7 +96,7 @@ class BookTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
-    void givenTableIsPopulatedByOneBook_whenFindAllByAuthorIdQueryIsCalled_thenReturnsAnEmptyListIsReturned() {
+    void test4() {
         var books = entityManager
                 .getEntityManager()
                 .createQuery("select b from Book b where b.author.id=:authorId", Book.class)
@@ -118,7 +118,7 @@ class BookTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
-    void givenTableIsPopulatedByOneBook_whenFindAllByTitleContainingQueryIsCalled_thenReturnsAListContainingThisBook() {
+    void test5() {
         var randomSubtitle = MessageFormat.format("%{0}%", Fixtures.BOOK_SUBTITLE);
         var books = entityManager
                 .getEntityManager()
@@ -144,7 +144,7 @@ class BookTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
-    void givenTableIsPopulatedByOneBook_whenFindAllByTitleContainingQueryIsCalled_thenReturnsAnEmptyListIsReturned() {
+    void test6() {
         var randomSubtitle = MessageFormat.format("%{0}%", Fixtures.getRandomUUID());
         var books = entityManager
                 .getEntityManager()
@@ -164,7 +164,7 @@ class BookTest {
             Then null is returned
             """)
     @Test
-    void givenTableIsEmpty_whenFindIsCalledWithRandomUUID_thenReturnsNull() {
+    void test7() {
         var book = entityManager.find(Book.class, Fixtures.getRandomUUID());
 
         then(book).isNull();
@@ -178,7 +178,7 @@ class BookTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
-    void givenTableIsPopulatedByOneBook_whenFindIsCalledWithBookUUID_thenReturnsBook() {
+    void test8() {
         var book = entityManager.find(Book.class, Fixtures.BOOK_UUID);
 
         then(book)
@@ -197,7 +197,7 @@ class BookTest {
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
-    void givenTransientBook_whenPersistIsCalled_thenPersistenceIsSuccess() {
+    void test9() {
         var persistedAuthor = entityManager.find(Author.class, Fixtures.AUTHOR_UUID);
 
         var transientBook = Fixtures.getTransientBook(persistedAuthor);
