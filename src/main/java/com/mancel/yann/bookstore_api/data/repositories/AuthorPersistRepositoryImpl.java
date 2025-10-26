@@ -1,7 +1,10 @@
 package com.mancel.yann.bookstore_api.data.repositories;
 
+import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.domain.exceptions.DomainException;
+import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
 import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
-import com.mancel.yann.bookstore_api.entities.Author;
+import com.mancel.yann.bookstore_api.data.models.AuthorModel;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaContext;
@@ -15,14 +18,20 @@ public class AuthorPersistRepositoryImpl implements AuthorPersistRepository {
 
     @Autowired
     public AuthorPersistRepositoryImpl(JpaContext context) {
-        this.entityManager = context.getEntityManagerByManagedType(Author.class);
+        this.entityManager = context.getEntityManagerByManagedType(AuthorModel.class);
     }
 
     @Override
     @Transactional
-    public Author saveFromRequest(AuthorCreationRequest request) {
-        var transientAuthor = request.convertToAuthor();
-        entityManager.persist(transientAuthor);
-        return transientAuthor;
+    public AuthorEntity saveFromRequest(AuthorCreationRequest request) throws DomainException {
+        try {
+            var transientAuthor = new AuthorModel(request);
+            entityManager.persist(transientAuthor);
+            return transientAuthor.getAuthorEntity();
+        } catch (DomainException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            throw new UnknownException(exception.getMessage(), exception);
+        }
     }
 }

@@ -1,9 +1,12 @@
 package com.mancel.yann.bookstore_api.data.repositories;
 
 import com.mancel.yann.bookstore_api.Fixtures;
+import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.domain.exceptions.DomainException;
+import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
 import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
-import com.mancel.yann.bookstore_api.entities.Author;
 import org.assertj.core.api.Condition;
+import org.hibernate.HibernateException;
 import org.hibernate.PropertyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,65 +30,67 @@ class AuthorPersistRepositoryTest {
     @Qualifier("authorPersistRepositoryImpl")
     AuthorPersistRepository authorPersistRepository;
 
-    AuthorCreationRequest convertAuthorToAuthorCreationRequest(Author author) {
+    AuthorCreationRequest convertEntityToRequest(AuthorEntity entity) {
         return new AuthorCreationRequest(
-                author.getEmail(),
-                author.getFirstName(),
-                author.getLastName());
+                entity.email(),
+                entity.firstName(),
+                entity.lastName());
     }
 
     @DisplayName(
             """
-            Given there is a valid author creation request
+            Given there is a valid request
             When the saveFromRequest method is called
             Then the persistence is success
-            And the persisted author is returned
+            And the entity is returned
             """)
     @Test
     void test1() {
-        var authorCreationRequest = Fixtures.getValidAuthorCreationRequest();
+        var request = Fixtures.getValidAuthorCreationRequest();
 
-        var persistedAuthor = authorPersistRepository.saveFromRequest(authorCreationRequest);
+        var persistedAuthor = authorPersistRepository.saveFromRequest(request);
 
         then(persistedAuthor)
                 .isNotNull()
                 .is(new Condition<>(
-                        author -> convertAuthorToAuthorCreationRequest(author).equals(authorCreationRequest),
-                        "is equal to the author creation request"))
-                .extracting(Author::getId)
+                        author -> convertEntityToRequest(author).equals(request),
+                        "is equal to the request"))
+                .extracting(AuthorEntity::id)
                     .isNotNull();
     }
 
-    static Stream<Arguments> invalidAuthorCreationRequestGenerator() {
+    static Stream<Arguments> invalidRequestGenerator() {
         return Stream.of(
                 arguments(
                         Fixtures.getInvalidAuthorCreationRequest(true, false),
-                        "^not-null property references a null or transient value.*Author.firstName$"),
+                        "firstName"),
                 arguments(Fixtures.getInvalidAuthorCreationRequest(false, true),
-                        "^not-null property references a null or transient value.*Author.lastName$"),
+                        "lastName"),
                 arguments(Fixtures.getInvalidAuthorCreationRequest(true, true),
-                        "^not-null property references a null or transient value.*Author.firstName$")
+                        "firstName")
         );
     }
 
     @DisplayName(
             """
-            Given there is a invalid author creation request
+            Given there is a invalid request
             When the saveFromRequest method is called
             Then the persistence is fail
             And a PropertyValueException is thrown
             """)
     @ParameterizedTest
-    @MethodSource("invalidAuthorCreationRequestGenerator")
-    void test2(
-            AuthorCreationRequest  authorCreationRequest,
-            String regex
-    ) {
-        var thrown = catchThrowable(() -> authorPersistRepository.saveFromRequest(authorCreationRequest));
+    @MethodSource("invalidRequestGenerator")
+    void test2(AuthorCreationRequest request, String propertyName) {
+        var thrown = catchThrowable(() -> authorPersistRepository.saveFromRequest(request));
 
         then(thrown)
-                .isExactlyInstanceOf(PropertyValueException.class)
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageMatching(regex);
+                .isExactlyInstanceOf(UnknownException.class)
+                .isInstanceOf(DomainException.class)
+                .hasMessageStartingWith("not-null property references a null or transient value")
+                .hasMessageEndingWith("AuthorModel." + propertyName)
+                .extracting(Throwable::getCause)
+                    .isExactlyInstanceOf(PropertyValueException.class)
+                    .isInstanceOf(HibernateException.class)
+                    .isInstanceOf(RuntimeException.class);
     }
 }

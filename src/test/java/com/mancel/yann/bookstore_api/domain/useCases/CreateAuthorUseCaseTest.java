@@ -1,6 +1,7 @@
 package com.mancel.yann.bookstore_api.domain.useCases;
 
 import com.mancel.yann.bookstore_api.Fixtures;
+import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
 import com.mancel.yann.bookstore_api.mocks.MockInjectorTest;
 import com.mancel.yann.bookstore_api.domain.delegates.ThrowableSupplier;
 import com.mancel.yann.bookstore_api.domain.exceptions.ValidationException;
@@ -25,18 +26,18 @@ import static org.mockito.ArgumentMatchers.any;
 @SuppressWarnings("unchecked")
 class CreateAuthorUseCaseTest extends MockInjectorTest {
 
-    @Mock
-    AuthorRepository mockedAuthorRepository;
-
     @Spy
     TransactionDelegate fakeTransactionDelegate = new FakeTransactionDelegate();
+
+    @Mock
+    AuthorRepository mockedAuthorRepository;
 
     @InjectMocks
     CreateAuthorUseCase createAuthorUseCase;
 
     @DisplayName(
             """
-            Given there is a valid author creation request
+            Given there is a valid request
             And the persistence will be success
             When the execute method is called
             Then the method is executed into transaction
@@ -44,26 +45,25 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
             """)
     @Test
     void test1() throws ValidationException {
-        var authorCreationRequest = Fixtures.getValidAuthorCreationRequest();
-        var transientAuthor = authorCreationRequest.convertToAuthor();
-        BDDMockito.given(mockedAuthorRepository.save(transientAuthor))
-                .willReturn(Fixtures.getPersistedAuthor());
+        var request = Fixtures.getValidAuthorCreationRequest();
+        BDDMockito.given(mockedAuthorRepository.saveFromRequest(request))
+                .willReturn(Fixtures.getPersistedAuthorEntity());
 
-        var persistedAuthor = createAuthorUseCase.execute(authorCreationRequest);
+        var persistedAuthor = createAuthorUseCase.execute(request);
 
         BDDMockito.then(fakeTransactionDelegate)
                 .should()
                 .executeIntoTransaction(any(ThrowableSupplier.class));
         BDDMockito.then(mockedAuthorRepository)
                 .should()
-                .save(transientAuthor);
+                .saveFromRequest(request);
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
         BDDAssertions.then(persistedAuthor)
-                .isEqualTo(Fixtures.getPersistedAuthor());
+                .isEqualTo(Fixtures.getPersistedAuthorEntity());
     }
 
-    static Stream<Arguments> invalidAuthorCreationRequestGenerator() {
+    static Stream<Arguments> invalidRequestGenerator() {
         return Stream.of(
                 arguments(
                         Fixtures.getInvalidAuthorCreationRequest(true, false),
@@ -71,25 +71,22 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
                 arguments(Fixtures.getInvalidAuthorCreationRequest(false, true),
                         "Last name is required."),
                 arguments(Fixtures.getInvalidAuthorCreationRequest(true, true),
-                        "First name is required.Last name is required.")
+                        "Last name is required.First name is required.")
         );
     }
 
     @DisplayName(
             """
-            Given there is an invalid author creation request
+            Given there is an invalid request
             When the execute method is called
             Then the method is executed into transaction
             And no persistence is performed
             And a ValidationException is thrown
             """)
     @ParameterizedTest
-    @MethodSource("invalidAuthorCreationRequestGenerator")
-    void test2(
-            AuthorCreationRequest  authorCreationRequest,
-            String errorMessage) {
-
-        var thrown = catchThrowable(() -> createAuthorUseCase.execute(authorCreationRequest));
+    @MethodSource("invalidRequestGenerator")
+    void test2(AuthorCreationRequest request, String errorMessage) {
+        var thrown = catchThrowable(() -> createAuthorUseCase.execute(request));
 
         BDDMockito.then(fakeTransactionDelegate)
                 .should()
@@ -103,30 +100,31 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
 
     @DisplayName(
             """
-            Given a valid author creation request
+            Given a valid request
             And the persistence will be fail
             When the execute method is called
             Then the method is executed into transaction
-            And null is returned
+            And no persistence is performed
+            And a DomainException is thrown
             """)
     @Test
     void test3() throws ValidationException {
-        var authorCreationRequest = Fixtures.getValidAuthorCreationRequest();
-        var transientAuthor = authorCreationRequest.convertToAuthor();
-        BDDMockito.given(mockedAuthorRepository.save(transientAuthor))
-                .willReturn(null);
+        var request = Fixtures.getValidAuthorCreationRequest();
+        var exception = new UnknownException("foo", new Exception("bar"));
+        BDDMockito.given(mockedAuthorRepository.saveFromRequest(request))
+                .willThrow(exception);
 
-        var unpersistedAuthor = createAuthorUseCase.execute(authorCreationRequest);
+        var thrown = catchThrowable(() -> createAuthorUseCase.execute(request));
 
         BDDMockito.then(fakeTransactionDelegate)
                 .should()
                 .executeIntoTransaction(any(ThrowableSupplier.class));
         BDDMockito.then(mockedAuthorRepository)
                 .should()
-                .save(transientAuthor);
+                .saveFromRequest(request);
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
-        BDDAssertions.then(unpersistedAuthor)
-                .isNull();
+        BDDAssertions.then(thrown)
+                .isExactlyInstanceOf(UnknownException.class);
     }
 }

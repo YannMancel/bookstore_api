@@ -1,4 +1,4 @@
-package com.mancel.yann.bookstore_api.entities;
+package com.mancel.yann.bookstore_api.data.models;
 
 import com.mancel.yann.bookstore_api.Fixtures;
 import org.junit.jupiter.api.DisplayName;
@@ -12,22 +12,22 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssumptions.given;
 
 @DataJpaTest
-class AuthorTest {
+class AuthorModelTest {
 
     @Autowired
     TestEntityManager entityManager;
 
     @DisplayName(
             """
-            Given the authors table is empty
-            When a JPQL query is called to find all entities
-            Then an empty author list is returned
+            Given the table is empty
+            When a JPQL query is called to find all authors
+            Then an empty list is returned
             """)
     @Test
     void test1() {
         var authors = entityManager
                 .getEntityManager()
-                .createQuery("select c from Author c", Author.class)
+                .createQuery("select m from AuthorModel m", AuthorModel.class)
                 .getResultList();
 
         then(authors)
@@ -37,17 +37,16 @@ class AuthorTest {
 
     @DisplayName(
             """
-            Given the authors table is populated by one author
-            When a JPQL query is called to find all entities
-            Then an author list is returned
-            And it contains this author
+            Given the table is populated by one author
+            When a JPQL query is called to find all authors
+            Then an list is returned with this author
             """)
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
     void test2() {
         var authors = entityManager
                 .getEntityManager()
-                .createQuery("select c from Author c", Author.class)
+                .createQuery("select m from AuthorModel m", AuthorModel.class)
                 .getResultList();
 
         then(authors)
@@ -55,37 +54,37 @@ class AuthorTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(Author::getId)
+                    .extracting(AuthorModel::getId)
                         .isEqualTo(Fixtures.AUTHOR_UUID);
     }
 
     @DisplayName(
             """
-            Given the authors table is empty
-            When the find method is called with a random UUID
+            Given the table is empty
+            When the find method is called with a random id
             Then null is returned
             """)
     @Test
     void test3() {
-        var author = entityManager.find(Author.class, Fixtures.getRandomUUID());
+        var author = entityManager.find(AuthorModel.class, Fixtures.getRandomUUID());
 
         then(author).isNull();
     }
 
     @DisplayName(
             """
-            Given the authors table is populated by one author
-            When the find method is called with the author's UUID
+            Given the table is populated by one author
+            When the find method is called with the author's id
             Then this author is returned
             """)
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
     void test4() {
-        var author = entityManager.find(Author.class, Fixtures.AUTHOR_UUID);
+        var author = entityManager.find(AuthorModel.class, Fixtures.AUTHOR_UUID);
 
         then(author)
                 .isNotNull()
-                .extracting(Author::getId)
+                .extracting(AuthorModel::getId)
                     .isEqualTo(Fixtures.AUTHOR_UUID);
     }
 
@@ -98,17 +97,17 @@ class AuthorTest {
             """)
     @Test
     void test5() {
-        var transientAuthor = Fixtures.getTransientAuthor();
+        var transientAuthor = Fixtures.getTransientAuthorModel();
         given(transientAuthor)
-                .extracting(Author::getId)
+                .extracting(AuthorModel::getId)
                     .isNull();
 
         var persistedAuthor = entityManager.persist(transientAuthor);
 
         then(transientAuthor)
                 .isEqualTo(persistedAuthor)
-                .isEqualTo(entityManager.find(Author.class, persistedAuthor.getId()))
-                .extracting(Author::getId)
+                .isEqualTo(entityManager.find(AuthorModel.class, persistedAuthor.getId()))
+                .extracting(AuthorModel::getId)
                     .isNotNull();
     }
 }

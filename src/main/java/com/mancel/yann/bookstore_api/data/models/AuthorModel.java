@@ -1,5 +1,7 @@
-package com.mancel.yann.bookstore_api.entities;
+package com.mancel.yann.bookstore_api.data.models;
 
+import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -7,7 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "authors")
-public class Author {
+public class AuthorModel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -21,12 +23,20 @@ public class Author {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    public Author() {}
+    public AuthorModel() {}
 
-    public Author(String email, String firstName, String lastName) {
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public AuthorModel(AuthorCreationRequest request) {
+        this.email = request.email();
+        this.firstName = request.firstName();
+        this.lastName = request.lastName();
+    }
+
+    public AuthorEntity getAuthorEntity() {
+        return new AuthorEntity(
+                getId(),
+                getEmail(),
+                getFirstName(),
+                getLastName());
     }
 
     public UUID getId() {
@@ -64,7 +74,7 @@ public class Author {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        Author author = (Author) o;
+        AuthorModel author = (AuthorModel) o;
         return Objects.equals(id, author.id) && Objects.equals(email, author.email) && Objects.equals(firstName, author.firstName) && Objects.equals(lastName, author.lastName);
     }
 

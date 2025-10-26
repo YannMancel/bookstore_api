@@ -18,7 +18,7 @@ class JpaTransactionDelegateTest {
 
     @DisplayName(
             """
-            Given there is a not throwing callback
+            Given there is a not throwing lambda
             When the executeIntoTransaction method is called
             Then the correct result is returned
             """)
@@ -33,11 +33,11 @@ class JpaTransactionDelegateTest {
 
     @DisplayName(
             """
-            Given there is a throwing callback
+            Given there is a throwing lambda
             And the exception is not a DomainException
             When the executeIntoTransaction method is called
             Then an UnknownException is thrown
-            And its cause is the callback's exception
+            And its cause is the lambda's exception
             """)
     @Test
     void test2() {
@@ -59,7 +59,7 @@ class JpaTransactionDelegateTest {
 
     @DisplayName(
             """
-            Given there is a throwing callback
+            Given there is a throwing lambda
             And the exception is a DomainException
             When the executeIntoTransaction method is called
             Then this exception is rethrown

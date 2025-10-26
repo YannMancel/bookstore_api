@@ -1,8 +1,9 @@
 package com.mancel.yann.bookstore_api;
 
+import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
-import com.mancel.yann.bookstore_api.entities.Author;
-import com.mancel.yann.bookstore_api.entities.Book;
+import com.mancel.yann.bookstore_api.data.models.AuthorModel;
+import com.mancel.yann.bookstore_api.data.models.BookModel;
 
 import java.util.UUID;
 
@@ -27,26 +28,35 @@ public class Fixtures {
 
     public static AuthorCreationRequest getInvalidAuthorCreationRequest(boolean hasNullFirstName,
                                                                         boolean hasNullLastName) {
-        var validAuthorCreationRequest = getValidAuthorCreationRequest();
+        var request = getValidAuthorCreationRequest();
         return new AuthorCreationRequest(
-                "john.doe@gmail.com",
-                hasNullFirstName ? null : validAuthorCreationRequest.firstName(),
-                hasNullLastName ? null : validAuthorCreationRequest.lastName());
+                request.email(),
+                hasNullFirstName ? null : request.firstName(),
+                hasNullLastName ? null : request.lastName());
     }
 
-    public static Author getTransientAuthor() {
-        return getValidAuthorCreationRequest().convertToAuthor();
+    public static AuthorModel getTransientAuthorModel() {
+        var request = getValidAuthorCreationRequest();
+        return new AuthorModel(request);
     }
 
-    public static Author getPersistedAuthor() {
-        var transientAuthor = getTransientAuthor();
-        transientAuthor.setId(AUTHOR_UUID);
-        return transientAuthor;
+    public static AuthorEntity getPersistedAuthorEntity() {
+        var model = getTransientAuthorModel();
+        return new AuthorEntity(
+                AUTHOR_UUID,
+                model.getEmail(),
+                model.getFirstName(),
+                model.getLastName());
     }
 
-    public static Book getTransientBook(Author author) {
-        return new Book(
+    public static BookModel getTransientBookModel(AuthorEntity author) {
+        var authorModel = new AuthorModel();
+        authorModel.setId(author.id());
+        authorModel.setEmail(author.email());
+        authorModel.setFirstName(author.firstName());
+        authorModel.setLastName(author.lastName());
+        return new BookModel(
                 "Berserk",
-                author);
+                authorModel);
     }
 }

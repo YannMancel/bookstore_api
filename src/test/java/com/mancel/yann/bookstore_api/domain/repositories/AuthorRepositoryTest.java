@@ -1,7 +1,7 @@
 package com.mancel.yann.bookstore_api.domain.repositories;
 
 import com.mancel.yann.bookstore_api.Fixtures;
-import com.mancel.yann.bookstore_api.entities.Author;
+import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +19,9 @@ class AuthorRepositoryTest {
 
     @DisplayName(
             """
-            Given the authors table is empty
+            Given the table is empty
             When the findAll method is called
-            Then an empty author list is returned
+            Then an empty list is returned
             """)
     @Test
     void test1() {
@@ -34,10 +34,9 @@ class AuthorRepositoryTest {
 
     @DisplayName(
             """
-            Given the authors table is populated by one author
+            Given the table is populated by one author
             When the findAll method is called
-            Then an author list is returned
-            And it contains this author
+            Then a list is returned with this author
             """)
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
@@ -49,15 +48,15 @@ class AuthorRepositoryTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(Author::getId)
+                    .extracting(AuthorEntity::id)
                         .isEqualTo(Fixtures.AUTHOR_UUID);
     }
 
     @DisplayName(
             """
-            Given the authors table is empty
-            When the findById method is called with a random UUID
-            Then an empty author optional is returned
+            Given the table is empty
+            When the findById method is called with a random id
+            Then an empty optional is returned
             """)
     @Test
     void test3() {
@@ -70,10 +69,9 @@ class AuthorRepositoryTest {
 
     @DisplayName(
             """
-            Given the authors table is populated by one author
-            When the findById method is called with the author's UUID
-            Then a not empty author optional is returned
-            And it contains this author
+            Given the table is populated by one author
+            When the findById method is called with the author's id
+            Then an optional is returned with this author
             """)
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
@@ -84,29 +82,27 @@ class AuthorRepositoryTest {
                 .isNotNull()
                 .isNotEmpty()
                 .get()
-                    .extracting(Author::getId)
+                    .extracting(AuthorEntity::id)
                         .isEqualTo(Fixtures.AUTHOR_UUID);
     }
 
     @DisplayName(
             """
-            Given there is a transient author
-            When the save method is called
+            Given there is a valid request
+            When the saveFromRequest method is called
             Then the persistence is success
             And the persisted author is return
             """)
     @Test
     void test5() {
-        var transientAuthor = Fixtures.getTransientAuthor();
-        given(transientAuthor)
-                .extracting(Author::getId)
-                    .isNull();
+        var request = Fixtures.getValidAuthorCreationRequest();
+        given(AuthorEntity.validRequestOrThrow(request))
+                .isEqualTo(request);
 
-        var persistedAuthor = authorRepository.save(transientAuthor);
+        var persistedAuthor = authorRepository.saveFromRequest(request);
 
-        then(transientAuthor)
-                .isEqualTo(persistedAuthor)
-                .extracting(Author::getId)
+        then(persistedAuthor)
+                .extracting(AuthorEntity::id)
                     .isNotNull();
     }
 }

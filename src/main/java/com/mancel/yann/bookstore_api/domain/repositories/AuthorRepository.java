@@ -1,17 +1,15 @@
 package com.mancel.yann.bookstore_api.domain.repositories;
 
+import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
-import com.mancel.yann.bookstore_api.entities.Author;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface AuthorRepository extends PersistRepository<Author, AuthorCreationRequest> {
+public interface AuthorRepository extends PersistRepository<AuthorCreationRequest, AuthorEntity> {
 
-    List<Author> findAll();
+    List<AuthorEntity> findAll();
 
-    Optional<Author> findById(UUID id);
-
-    Author save(Author entity);
+    Optional<AuthorEntity> findById(UUID id);
 }
