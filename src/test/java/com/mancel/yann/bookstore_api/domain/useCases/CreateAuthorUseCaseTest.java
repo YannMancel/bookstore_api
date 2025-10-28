@@ -45,9 +45,9 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
             """)
     @Test
     void test1() throws ValidationException {
-        var request = Fixtures.getValidAuthorCreationRequest();
+        var request = Fixtures.Author.getValidAuthorCreationRequest();
         BDDMockito.given(mockedAuthorRepository.saveFromRequest(request))
-                .willReturn(Fixtures.getPersistedAuthorEntity());
+                .willReturn(Fixtures.Author.getPersistedAuthorEntity());
 
         var persistedAuthor = createAuthorUseCase.execute(request);
 
@@ -60,17 +60,17 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
         BDDAssertions.then(persistedAuthor)
-                .isEqualTo(Fixtures.getPersistedAuthorEntity());
+                .isEqualTo(Fixtures.Author.getPersistedAuthorEntity());
     }
 
     static Stream<Arguments> invalidRequestGenerator() {
         return Stream.of(
                 arguments(
-                        Fixtures.getInvalidAuthorCreationRequest(true, false),
+                        Fixtures.Author.getInvalidAuthorCreationRequest(true, false),
                         "First name is required."),
-                arguments(Fixtures.getInvalidAuthorCreationRequest(false, true),
+                arguments(Fixtures.Author.getInvalidAuthorCreationRequest(false, true),
                         "Last name is required."),
-                arguments(Fixtures.getInvalidAuthorCreationRequest(true, true),
+                arguments(Fixtures.Author.getInvalidAuthorCreationRequest(true, true),
                         "Last name is required.First name is required.")
         );
     }
@@ -109,7 +109,7 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
             """)
     @Test
     void test3() throws ValidationException {
-        var request = Fixtures.getValidAuthorCreationRequest();
+        var request = Fixtures.Author.getValidAuthorCreationRequest();
         var exception = new UnknownException("foo", new Exception("bar"));
         BDDMockito.given(mockedAuthorRepository.saveFromRequest(request))
                 .willThrow(exception);

@@ -46,7 +46,7 @@ class AuthorPersistRepositoryTest {
             """)
     @Test
     void test1() {
-        var request = Fixtures.getValidAuthorCreationRequest();
+        var request = Fixtures.Author.getValidAuthorCreationRequest();
 
         var persistedAuthor = authorPersistRepository.saveFromRequest(request);
 
@@ -62,11 +62,11 @@ class AuthorPersistRepositoryTest {
     static Stream<Arguments> invalidRequestGenerator() {
         return Stream.of(
                 arguments(
-                        Fixtures.getInvalidAuthorCreationRequest(true, false),
+                        Fixtures.Author.getInvalidAuthorCreationRequest(true, false),
                         "firstName"),
-                arguments(Fixtures.getInvalidAuthorCreationRequest(false, true),
+                arguments(Fixtures.Author.getInvalidAuthorCreationRequest(false, true),
                         "lastName"),
-                arguments(Fixtures.getInvalidAuthorCreationRequest(true, true),
+                arguments(Fixtures.Author.getInvalidAuthorCreationRequest(true, true),
                         "firstName")
         );
     }

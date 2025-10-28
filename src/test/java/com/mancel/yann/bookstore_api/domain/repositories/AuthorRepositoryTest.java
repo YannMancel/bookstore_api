@@ -49,7 +49,7 @@ class AuthorRepositoryTest {
                 .hasSize(1)
                 .element(0)
                     .extracting(AuthorEntity::id)
-                        .isEqualTo(Fixtures.AUTHOR_UUID);
+                        .isEqualTo(Fixtures.Author.AUTHOR_UUID);
     }
 
     @DisplayName(
@@ -76,14 +76,14 @@ class AuthorRepositoryTest {
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
     void test4() {
-        var authorOptional = authorRepository.findById(Fixtures.AUTHOR_UUID);
+        var authorOptional = authorRepository.findById(Fixtures.Author.AUTHOR_UUID);
 
         then(authorOptional)
                 .isNotNull()
                 .isNotEmpty()
                 .get()
                     .extracting(AuthorEntity::id)
-                        .isEqualTo(Fixtures.AUTHOR_UUID);
+                        .isEqualTo(Fixtures.Author.AUTHOR_UUID);
     }
 
     @DisplayName(
@@ -95,7 +95,7 @@ class AuthorRepositoryTest {
             """)
     @Test
     void test5() {
-        var request = Fixtures.getValidAuthorCreationRequest();
+        var request = Fixtures.Author.getValidAuthorCreationRequest();
         given(AuthorEntity.validRequestOrThrow(request))
                 .isEqualTo(request);
 

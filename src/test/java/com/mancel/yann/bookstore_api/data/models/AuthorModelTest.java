@@ -55,7 +55,7 @@ class AuthorModelTest {
                 .hasSize(1)
                 .element(0)
                     .extracting(AuthorModel::getId)
-                        .isEqualTo(Fixtures.AUTHOR_UUID);
+                        .isEqualTo(Fixtures.Author.AUTHOR_UUID);
     }
 
     @DisplayName(
@@ -80,12 +80,12 @@ class AuthorModelTest {
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
     void test4() {
-        var author = entityManager.find(AuthorModel.class, Fixtures.AUTHOR_UUID);
+        var author = entityManager.find(AuthorModel.class, Fixtures.Author.AUTHOR_UUID);
 
         then(author)
                 .isNotNull()
                 .extracting(AuthorModel::getId)
-                    .isEqualTo(Fixtures.AUTHOR_UUID);
+                    .isEqualTo(Fixtures.Author.AUTHOR_UUID);
     }
 
     @DisplayName(
@@ -97,7 +97,7 @@ class AuthorModelTest {
             """)
     @Test
     void test5() {
-        var transientAuthor = Fixtures.getTransientAuthorModel();
+        var transientAuthor = Fixtures.Author.getTransientAuthorModel();
         given(transientAuthor)
                 .extracting(AuthorModel::getId)
                     .isNull();
