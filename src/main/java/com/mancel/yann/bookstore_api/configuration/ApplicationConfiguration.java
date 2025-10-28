@@ -2,8 +2,11 @@ package com.mancel.yann.bookstore_api.configuration;
 
 import com.mancel.yann.bookstore_api.data.delegates.JpaTransactionDelegate;
 import com.mancel.yann.bookstore_api.domain.delegates.TransactionDelegate;
+import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.repositories.AuthorRepository;
+import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
 import com.mancel.yann.bookstore_api.domain.useCases.CreateAuthorUseCase;
+import com.mancel.yann.bookstore_api.domain.useCases.CreateUseCase;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +24,10 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public CreateAuthorUseCase createAuthorUseCase(TransactionDelegate transactionDelegate,
-                                                   AuthorRepository authorRepository) {
+    public CreateUseCase<AuthorCreationRequest, AuthorEntity> createAuthorUseCase(
+            TransactionDelegate transactionDelegate,
+            AuthorRepository authorRepository
+    ) {
         return new CreateAuthorUseCase(transactionDelegate, authorRepository);
     }
 }
