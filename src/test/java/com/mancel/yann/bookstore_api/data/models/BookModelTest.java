@@ -1,4 +1,4 @@
-package com.mancel.yann.bookstore_api.entities;
+package com.mancel.yann.bookstore_api.data.models;
 
 import com.mancel.yann.bookstore_api.Fixtures;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +14,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssumptions.given;
 
 @DataJpaTest
-class BookTest {
+class BookModelTest {
 
     @Autowired
     TestEntityManager entityManager;
@@ -29,7 +29,7 @@ class BookTest {
     void test1() {
         var books = entityManager
                 .getEntityManager()
-                .createQuery("select c from Book c", Book.class)
+                .createQuery("select m from BookModel m", BookModel.class)
                 .getResultList();
 
         then(books)
@@ -49,7 +49,7 @@ class BookTest {
     void test2() {
         var books = entityManager
                 .getEntityManager()
-                .createQuery("select c from Book c", Book.class)
+                .createQuery("select m from BookModel m", BookModel.class)
                 .getResultList();
 
         then(books)
@@ -57,8 +57,8 @@ class BookTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(Book::getId)
-                        .isEqualTo(Fixtures.BOOK_UUID);
+                    .extracting(BookModel::getId)
+                        .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
     @DisplayName(
@@ -74,8 +74,8 @@ class BookTest {
     void test3() {
         var books = entityManager
                 .getEntityManager()
-                .createQuery("select b from Book b where b.author.id=:authorId", Book.class)
-                .setParameter("authorId", Fixtures.AUTHOR_UUID)
+                .createQuery("select m from BookModel m where m.author.id=:authorId", BookModel.class)
+                .setParameter("authorId", Fixtures.Author.AUTHOR_UUID)
                 .getResultList();
 
         then(books)
@@ -83,8 +83,8 @@ class BookTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(Book::getId)
-                        .isEqualTo(Fixtures.BOOK_UUID);
+                    .extracting(BookModel::getId)
+                        .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
     @DisplayName(
@@ -99,7 +99,7 @@ class BookTest {
     void test4() {
         var books = entityManager
                 .getEntityManager()
-                .createQuery("select b from Book b where b.author.id=:authorId", Book.class)
+                .createQuery("select m from BookModel m where m.author.id=:authorId", BookModel.class)
                 .setParameter("authorId", Fixtures.getRandomUUID())
                 .getResultList();
 
@@ -119,10 +119,10 @@ class BookTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void test5() {
-        var randomSubtitle = MessageFormat.format("%{0}%", Fixtures.BOOK_SUBTITLE);
+        var randomSubtitle = MessageFormat.format("%{0}%", Fixtures.Book.BOOK_SUBTITLE);
         var books = entityManager
                 .getEntityManager()
-                .createQuery("select b from Book b where b.title like :title", Book.class)
+                .createQuery("select m from BookModel m where m.title like :title", BookModel.class)
                 .setParameter("title", randomSubtitle)
                 .getResultList();
 
@@ -131,8 +131,8 @@ class BookTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(Book::getId)
-                        .isEqualTo(Fixtures.BOOK_UUID);
+                    .extracting(BookModel::getId)
+                        .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
     @DisplayName(
@@ -148,7 +148,7 @@ class BookTest {
         var randomSubtitle = MessageFormat.format("%{0}%", Fixtures.getRandomUUID());
         var books = entityManager
                 .getEntityManager()
-                .createQuery("select b from Book b where b.title like :title", Book.class)
+                .createQuery("select m from BookModel m where m.title like :title", BookModel.class)
                 .setParameter("title", randomSubtitle)
                 .getResultList();
 
@@ -165,7 +165,7 @@ class BookTest {
             """)
     @Test
     void test7() {
-        var book = entityManager.find(Book.class, Fixtures.getRandomUUID());
+        var book = entityManager.find(BookModel.class, Fixtures.getRandomUUID());
 
         then(book).isNull();
     }
@@ -179,12 +179,12 @@ class BookTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void test8() {
-        var book = entityManager.find(Book.class, Fixtures.BOOK_UUID);
+        var book = entityManager.find(BookModel.class, Fixtures.Book.BOOK_UUID);
 
         then(book)
                 .isNotNull()
-                .extracting(Book::getId)
-                    .isEqualTo(Fixtures.BOOK_UUID);
+                .extracting(BookModel::getId)
+                    .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
     @DisplayName(
@@ -198,19 +198,19 @@ class BookTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void test9() {
-        var persistedAuthor = entityManager.find(Author.class, Fixtures.AUTHOR_UUID);
+        var persistedAuthor = entityManager.find(AuthorModel.class, Fixtures.Author.AUTHOR_UUID);
 
-        var transientBook = Fixtures.getTransientBook(persistedAuthor);
+        var transientBook = Fixtures.Book.getTransientBookModel(persistedAuthor.getAuthorEntity());
         given(transientBook)
-                .extracting(Book::getId)
+                .extracting(BookModel::getId)
                     .isNull();
 
         var persistedBook = entityManager.persist(transientBook);
 
         then(transientBook)
                 .isEqualTo(persistedBook)
-                .isEqualTo(entityManager.find(Book.class, persistedBook.getId()))
-                .extracting(Book::getId)
+                .isEqualTo(entityManager.find(BookModel.class, persistedBook.getId()))
+                .extracting(BookModel::getId)
                     .isNotNull();
     }
 }

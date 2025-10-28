@@ -1,22 +1,20 @@
 package com.mancel.yann.bookstore_api.domain.repositories;
 
-import com.mancel.yann.bookstore_api.entities.Book;
-import org.springframework.data.repository.NoRepositoryBean;
+import com.mancel.yann.bookstore_api.data.models.BookModel;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@NoRepositoryBean
 public interface BookRepository {
 
-    List<Book> findAll();
+    List<BookModel> findAll();
 
-    List<Book> findAllByAuthorId(UUID authorId);
+    List<BookModel> findAllByAuthorId(UUID authorId);
 
-    List<Book> findAllByTitleContaining(String subtitle);
+    List<BookModel> findAllByTitleContaining(String subtitle);
 
-    Optional<Book> findById(UUID id);
+    Optional<BookModel> findById(UUID id);
 
-    Book save(Book entity);
+    BookModel save(BookModel entity);
 }

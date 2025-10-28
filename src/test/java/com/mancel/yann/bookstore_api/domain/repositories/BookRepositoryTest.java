@@ -1,7 +1,7 @@
 package com.mancel.yann.bookstore_api.domain.repositories;
 
 import com.mancel.yann.bookstore_api.Fixtures;
-import com.mancel.yann.bookstore_api.entities.Book;
+import com.mancel.yann.bookstore_api.data.models.BookModel;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +22,9 @@ class BookRepositoryTest {
 
     @DisplayName(
             """
-            Given the books table is empty
+            Given the table is empty
             When the findAll method is called
-            Then an empty book list is returned
+            Then an empty list is returned
             """)
     @Test
     void test1() {
@@ -37,10 +37,9 @@ class BookRepositoryTest {
 
     @DisplayName(
             """
-            Given the books table is populated by one book
+            Given the table is populated by one book
             When the findAll method is called
-            Then a book list is returned
-            And it contains this book
+            Then a list is returned with this book
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
@@ -52,36 +51,35 @@ class BookRepositoryTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(Book::getId)
-                        .isEqualTo(Fixtures.BOOK_UUID);
+                    .extracting(BookModel::getId)
+                        .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
     @DisplayName(
             """
-            Given the books table is populated by one book
-            When the findAllByAuthorId method is called with the author's UUID of this book
-            Then a book list is returned
-            And it contains this book
+            Given the table is populated by one book
+            When the findAllByAuthorId method is called with the book's id
+            Then a list is returned with this book
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void test3() {
-        var books = bookRepository.findAllByAuthorId(Fixtures.AUTHOR_UUID);
+        var books = bookRepository.findAllByAuthorId(Fixtures.Author.AUTHOR_UUID);
 
         then(books)
                 .isNotNull()
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(Book::getId)
-                        .isEqualTo(Fixtures.BOOK_UUID);
+                    .extracting(BookModel::getId)
+                        .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
     @DisplayName(
             """
-            Given the books table is populated by one book
-            When the findAllByAuthorId method is called with a random UUID
-            Then an empty book list is returned
+            Given the table is populated by one book
+            When the findAllByAuthorId method is called with a random id
+            Then an empty list is returned
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
@@ -95,30 +93,29 @@ class BookRepositoryTest {
 
     @DisplayName(
             """
-            Given the books table is populated by one book
+            Given the table is populated by one book
             When the findAllByTitleContaining method is called with a subtitle of book's title
-            Then a book list is returned
-            And it contains this book
+            Then a list is returned with this book
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void test5() {
-        var books = bookRepository.findAllByTitleContaining(Fixtures.BOOK_SUBTITLE);
+        var books = bookRepository.findAllByTitleContaining(Fixtures.Book.BOOK_SUBTITLE);
 
         then(books)
                 .isNotNull()
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(Book::getId)
-                        .isEqualTo(Fixtures.BOOK_UUID);
+                    .extracting(BookModel::getId)
+                        .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
     @DisplayName(
             """
-            Given the books table is populated by one book
+            Given the table is populated by one book
             When the findAllByTitleContaining method is called with a random subtitle
-            Then an empty book list is returned
+            Then an empty list is returned
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
@@ -134,8 +131,8 @@ class BookRepositoryTest {
 
     @DisplayName(
             """
-            Given the books table is empty
-            When the findById method is called with a random UUID
+            Given the table is empty
+            When the findById method is called with a random id
             Then an empty optional is returned
             """)
     @Test
@@ -149,27 +146,26 @@ class BookRepositoryTest {
 
     @DisplayName(
             """
-            Given the books table is populated by one book
-            When the findById method is called with the book's UUID
-            Then a not empty book optional is returned
-            And it contains this book
+            Given the table is populated by one book
+            When the findById method is called with the book's id
+            Then an optional is returned with this book
             """)
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void test8() {
-        var bookOptional = bookRepository.findById(Fixtures.BOOK_UUID);
+        var bookOptional = bookRepository.findById(Fixtures.Book.BOOK_UUID);
 
         then(bookOptional)
                 .isNotNull()
                 .isNotEmpty()
                 .get()
-                    .extracting(Book::getId)
-                        .isEqualTo(Fixtures.BOOK_UUID);
+                    .extracting(BookModel::getId)
+                        .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
     @DisplayName(
             """
-            Given there is a persisted author
+            Given there is already a persisted author
             And there is a transient book
             When the save method is called
             Then the persistence is success
@@ -179,18 +175,18 @@ class BookRepositoryTest {
     @Sql({"/scripts/insert_one_author.sql"})
     void test9() {
         var persistedAuthor = authorRepository
-                .findById(Fixtures.AUTHOR_UUID)
+                .findById(Fixtures.Author.AUTHOR_UUID)
                 .orElseThrow();
-        var transientBook = Fixtures.getTransientBook(persistedAuthor);
+        var transientBook = Fixtures.Book.getTransientBookModel(persistedAuthor);
         given(transientBook)
-                .extracting(Book::getId)
+                .extracting(BookModel::getId)
                     .isNull();
 
         var persistedBook = bookRepository.save(transientBook);
 
         then(transientBook)
                 .isEqualTo(persistedBook)
-                .extracting(Book::getId)
+                .extracting(BookModel::getId)
                     .isNotNull();
     }
 }
