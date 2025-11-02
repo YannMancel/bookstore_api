@@ -1,7 +1,6 @@
 package com.mancel.yann.bookstore_api.data.models;
 
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
-import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -24,12 +23,6 @@ public class AuthorModel {
     private String lastName;
 
     public AuthorModel() {}
-
-    public AuthorModel(AuthorCreationRequest request) {
-        this.email = request.email();
-        this.firstName = request.firstName();
-        this.lastName = request.lastName();
-    }
 
     public AuthorEntity getAuthorEntity() {
         return new AuthorEntity(
@@ -81,5 +74,21 @@ public class AuthorModel {
     @Override
     public int hashCode() {
         return Objects.hash(id, email, firstName, lastName);
+    }
+
+    public static Builder getBuilder() {
+        return new DefaultAuthorModelBuilder();
+    }
+
+    public interface Builder {
+        Builder setId(UUID id);
+
+        Builder setEmail(String email);
+
+        Builder setFirstName(String firstName);
+
+        Builder setLastName(String lastName);
+
+        AuthorModel build();
     }
 }

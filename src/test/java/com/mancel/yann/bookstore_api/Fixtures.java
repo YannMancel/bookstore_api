@@ -34,7 +34,11 @@ public class Fixtures {
 
         public static AuthorModel getTransientAuthorModel() {
             var request = getValidAuthorCreationRequest();
-            return new AuthorModel(request);
+            return AuthorModel.getBuilder()
+                    .setEmail(request.email())
+                    .setFirstName(request.firstName())
+                    .setLastName(request.lastName())
+                    .build();
         }
 
         public static AuthorEntity getPersistedAuthorEntity() {
@@ -53,11 +57,12 @@ public class Fixtures {
         public static final String BOOK_SUBTITLE = "Horde";
 
         public static BookModel getTransientBookModel(AuthorEntity author) {
-            var authorModel = new AuthorModel();
-            authorModel.setId(author.id());
-            authorModel.setEmail(author.email());
-            authorModel.setFirstName(author.firstName());
-            authorModel.setLastName(author.lastName());
+            var authorModel = AuthorModel.getBuilder()
+                    .setId(author.id())
+                    .setEmail(author.email())
+                    .setFirstName(author.firstName())
+                    .setLastName(author.lastName())
+                    .build();
             return new BookModel(
                     "Berserk",
                     authorModel);

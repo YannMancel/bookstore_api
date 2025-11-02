@@ -25,7 +25,11 @@ public class AuthorPersistRepositoryImpl implements AuthorPersistRepository {
     @Transactional
     public AuthorEntity saveFromRequest(AuthorCreationRequest request) throws DomainException {
         try {
-            var transientAuthor = new AuthorModel(request);
+            var transientAuthor = AuthorModel.getBuilder()
+                    .setEmail(request.email())
+                    .setFirstName(request.firstName())
+                    .setLastName(request.lastName())
+                    .build();
             entityManager.persist(transientAuthor);
             return transientAuthor.getAuthorEntity();
         } catch (DomainException exception) {
