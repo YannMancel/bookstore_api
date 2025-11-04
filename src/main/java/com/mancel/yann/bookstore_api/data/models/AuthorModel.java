@@ -1,5 +1,6 @@
 package com.mancel.yann.bookstore_api.data.models;
 
+import com.mancel.yann.bookstore_api.data.models.builders.DefaultAuthorModelBuilder;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import jakarta.persistence.*;
 

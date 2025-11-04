@@ -1,4 +1,7 @@
-package com.mancel.yann.bookstore_api.data.models;
+package com.mancel.yann.bookstore_api.data.models.builders;
+
+import com.mancel.yann.bookstore_api.data.models.AuthorModel;
+import com.mancel.yann.bookstore_api.data.models.BookModel;
 
 import java.util.UUID;
 
