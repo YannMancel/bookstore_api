@@ -64,6 +64,10 @@ public class AuthorModel {
         this.lastName = lastName;
     }
 
+    public static Builder getBuilder() {
+        return new DefaultAuthorModelBuilder();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -74,10 +78,6 @@ public class AuthorModel {
     @Override
     public int hashCode() {
         return Objects.hash(id, email, firstName, lastName);
-    }
-
-    public static Builder getBuilder() {
-        return new DefaultAuthorModelBuilder();
     }
 
     public interface Builder {

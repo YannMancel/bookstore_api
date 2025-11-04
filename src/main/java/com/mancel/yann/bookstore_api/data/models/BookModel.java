@@ -49,6 +49,10 @@ public class BookModel {
         this.author = author;
     }
 
+    public Builder getBuilder() {
+        return new DefaultBookModelBuilder();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -59,5 +63,15 @@ public class BookModel {
     @Override
     public int hashCode() {
         return Objects.hash(id, title, author);
+    }
+
+    public interface Builder {
+        Builder setId(UUID id);
+
+        Builder setTitle(String title);
+
+        Builder setAuthor(AuthorModel author);
+
+        BookModel build();
     }
 }
