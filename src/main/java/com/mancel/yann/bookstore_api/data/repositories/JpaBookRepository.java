@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface JpaBookRepository extends BookRepository, ListCrudRepository<BookModel, UUID> {
+public interface JpaBookRepository extends BookRepository, BookPersistRepository, ListCrudRepository<BookModel, UUID> {
 
     @Override
     @Query(value = "select m from BookModel m where m.author.id=:authorId")

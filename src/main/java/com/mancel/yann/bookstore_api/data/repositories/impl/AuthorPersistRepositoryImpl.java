@@ -1,5 +1,6 @@
-package com.mancel.yann.bookstore_api.data.repositories;
+package com.mancel.yann.bookstore_api.data.repositories.impl;
 
+import com.mancel.yann.bookstore_api.data.repositories.AuthorPersistRepository;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.exceptions.DomainException;
 import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;

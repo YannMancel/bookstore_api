@@ -11,9 +11,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 @org.springframework.stereotype.Repository
-public interface JpaAuthorRepository extends AuthorRepository,
-                                             AuthorPersistRepository,
-                                             Repository<AuthorModel, UUID> {
+public interface JpaAuthorRepository extends AuthorRepository, AuthorPersistRepository, Repository<AuthorModel, UUID> {
+
     @Override
     @Query(value = "select m from AuthorModel m")
     List<AuthorEntity> findAll();
