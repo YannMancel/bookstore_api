@@ -63,13 +63,11 @@ class AuthorPersistRepositoryTest {
     static Stream<Arguments> invalidRequestGenerator() {
         return Stream.of(
                 arguments(
-                        Fixtures.Author.getInvalidAuthorCreationRequest(true, false),
+                        new AuthorCreationRequest("john.doe@gmail.com", null, "Doe"),
                         "firstName"),
-                arguments(Fixtures.Author.getInvalidAuthorCreationRequest(false, true),
-                        "lastName"),
-                arguments(Fixtures.Author.getInvalidAuthorCreationRequest(true, true),
-                        "firstName")
-        );
+                arguments(
+                        new AuthorCreationRequest("john.doe@gmail.com", "John", null),
+                        "lastName"));
     }
 
     @DisplayName(

@@ -4,6 +4,7 @@ import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
 import com.mancel.yann.bookstore_api.data.models.AuthorModel;
 import com.mancel.yann.bookstore_api.data.models.BookModel;
+import com.mancel.yann.bookstore_api.domain.requests.BookCreationRequest;
 
 import java.util.UUID;
 
@@ -17,19 +18,7 @@ public class Fixtures {
         public static final UUID AUTHOR_UUID = UUID.fromString("64f07a63-1c1c-415e-b2c7-6a54860e6083");
 
         public static AuthorCreationRequest getValidAuthorCreationRequest() {
-            return new AuthorCreationRequest(
-                    "john.doe@gmail.com",
-                    "John",
-                    "Doe");
-        }
-
-        public static AuthorCreationRequest getInvalidAuthorCreationRequest(boolean hasNullFirstName,
-                                                                            boolean hasNullLastName) {
-            var request = getValidAuthorCreationRequest();
-            return new AuthorCreationRequest(
-                    request.email(),
-                    hasNullFirstName ? null : request.firstName(),
-                    hasNullLastName ? null : request.lastName());
+            return new AuthorCreationRequest("john.doe@gmail.com", "John", "Doe");
         }
 
         public static AuthorModel getTransientAuthorModel() {
@@ -56,16 +45,17 @@ public class Fixtures {
 
         public static final String BOOK_SUBTITLE = "Horde";
 
-        public static BookModel getTransientBookModel(AuthorEntity author) {
-            var authorModel = AuthorModel.getBuilder()
-                    .setId(author.id())
-                    .setEmail(author.email())
-                    .setFirstName(author.firstName())
-                    .setLastName(author.lastName())
+        public static BookCreationRequest getValidBookCreationRequest() {
+            return new BookCreationRequest("Berserk", Author.AUTHOR_UUID);
+        }
+        public static BookModel getTransientBookModel() {
+            var request = getValidBookCreationRequest();
+            var authorModel = Author.getTransientAuthorModel();
+            authorModel.setId(Author.AUTHOR_UUID);
+            return BookModel.getBuilder()
+                    .setTitle(request.title())
+                    .setAuthor(authorModel)
                     .build();
-            return new BookModel(
-                    "Berserk",
-                    authorModel);
         }
     }
 }

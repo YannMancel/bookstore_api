@@ -199,8 +199,8 @@ class BookModelTest {
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void test9() {
         var persistedAuthor = entityManager.find(AuthorModel.class, Fixtures.Author.AUTHOR_UUID);
-
-        var transientBook = Fixtures.Book.getTransientBookModel(persistedAuthor.getAuthorEntity());
+        var transientBook = Fixtures.Book.getTransientBookModel();
+        given(persistedAuthor.getId()).isEqualTo(transientBook.getAuthor().getId());
         given(transientBook)
                 .extracting(BookModel::getId)
                     .isNull();

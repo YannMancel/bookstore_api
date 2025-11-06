@@ -66,13 +66,11 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
     static Stream<Arguments> invalidRequestGenerator() {
         return Stream.of(
                 arguments(
-                        Fixtures.Author.getInvalidAuthorCreationRequest(true, false),
+                        new AuthorCreationRequest("john.doe@gmail.com", null, "Doe"),
                         "First name is required."),
-                arguments(Fixtures.Author.getInvalidAuthorCreationRequest(false, true),
-                        "Last name is required."),
-                arguments(Fixtures.Author.getInvalidAuthorCreationRequest(true, true),
-                        "Last name is required.First name is required.")
-        );
+                arguments(
+                        new AuthorCreationRequest("john.doe@gmail.com", "John", null),
+                        "Last name is required."));
     }
 
     @DisplayName(

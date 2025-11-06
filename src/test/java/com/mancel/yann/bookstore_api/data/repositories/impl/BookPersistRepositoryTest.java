@@ -44,7 +44,7 @@ class BookPersistRepositoryTest {
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
     void test1() {
-        var request = new BookCreationRequest("Berserk", Fixtures.Author.AUTHOR_UUID);
+        var request = Fixtures.Book.getValidBookCreationRequest();
 
         var persistedBook = bookPersistRepository.saveFromRequest(request);
 
