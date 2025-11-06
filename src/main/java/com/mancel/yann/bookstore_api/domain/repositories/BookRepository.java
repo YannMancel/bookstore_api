@@ -17,6 +17,4 @@ public interface BookRepository extends PersistRepository<BookCreationRequest, B
     List<BookModel> findAllByTitleContaining(String subtitle);
 
     Optional<BookModel> findById(UUID id);
-
-    BookModel save(BookModel entity);
 }

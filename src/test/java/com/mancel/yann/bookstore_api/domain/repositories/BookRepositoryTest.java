@@ -9,16 +9,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssumptions.given;
 
 @DataJpaTest
 class BookRepositoryTest {
 
     @Autowired
     BookRepository bookRepository;
-
-    @Autowired
-    AuthorRepository authorRepository;
 
     @DisplayName(
             """
@@ -161,32 +157,5 @@ class BookRepositoryTest {
                 .get()
                     .extracting(BookModel::getId)
                         .isEqualTo(Fixtures.Book.BOOK_UUID);
-    }
-
-    @DisplayName(
-            """
-            Given there is already a persisted author
-            And there is a transient book
-            When the save method is called
-            Then the persistence is success
-            And the persisted book is return
-            """)
-    @Test
-    @Sql({"/scripts/insert_one_author.sql"})
-    void test9() {
-        var persistedAuthor = authorRepository
-                .findById(Fixtures.Author.AUTHOR_UUID)
-                .orElseThrow();
-        var transientBook = Fixtures.Book.getTransientBookModel(persistedAuthor);
-        given(transientBook)
-                .extracting(BookModel::getId)
-                    .isNull();
-
-        var persistedBook = bookRepository.save(transientBook);
-
-        then(transientBook)
-                .isEqualTo(persistedBook)
-                .extracting(BookModel::getId)
-                    .isNotNull();
     }
 }
