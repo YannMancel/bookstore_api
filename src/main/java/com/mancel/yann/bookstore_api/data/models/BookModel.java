@@ -22,11 +22,6 @@ public class BookModel {
 
     public BookModel() {}
 
-    public BookModel(String title, AuthorModel author) {
-        this.title = title;
-        this.author = author;
-    }
-
     public BookEntity getBookEntity() {
         return new BookEntity(
                 getId(),

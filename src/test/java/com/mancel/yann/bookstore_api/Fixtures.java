@@ -1,6 +1,7 @@
 package com.mancel.yann.bookstore_api;
 
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.domain.entities.BookEntity;
 import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
 import com.mancel.yann.bookstore_api.data.models.AuthorModel;
 import com.mancel.yann.bookstore_api.data.models.BookModel;
@@ -56,6 +57,14 @@ public class Fixtures {
                     .setTitle(request.title())
                     .setAuthor(authorModel)
                     .build();
+        }
+
+        public static BookEntity getPersistedBookEntity() {
+            var model = getTransientBookModel();
+            return new BookEntity(
+                    BOOK_UUID,
+                    model.getTitle(),
+                    model.getAuthor().getAuthorEntity());
         }
     }
 }
