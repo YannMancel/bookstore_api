@@ -1,7 +1,7 @@
 package com.mancel.yann.bookstore_api.domain.repositories;
 
 import com.mancel.yann.bookstore_api.Fixtures;
-import com.mancel.yann.bookstore_api.data.models.BookModel;
+import com.mancel.yann.bookstore_api.domain.entities.BookEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ class BookRepositoryTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(BookModel::getId)
+                    .extracting(BookEntity::id)
                         .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
@@ -67,7 +67,7 @@ class BookRepositoryTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(BookModel::getId)
+                    .extracting(BookEntity::id)
                         .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
@@ -103,7 +103,7 @@ class BookRepositoryTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(BookModel::getId)
+                    .extracting(BookEntity::id)
                         .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
@@ -155,7 +155,7 @@ class BookRepositoryTest {
                 .isNotNull()
                 .isNotEmpty()
                 .get()
-                    .extracting(BookModel::getId)
+                    .extracting(BookEntity::id)
                         .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 }

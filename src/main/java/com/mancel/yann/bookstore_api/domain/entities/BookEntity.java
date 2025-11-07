@@ -8,6 +8,15 @@ import java.util.UUID;
 
 public record BookEntity(UUID id, String title, AuthorEntity author) {
 
+    public BookEntity(UUID id,
+                      String title,
+                      UUID authorId,
+                      String authorEmail,
+                      String authorFirstName,
+                      String authorLastName) {
+        this(id, title, new AuthorEntity(authorId, authorEmail, authorFirstName, authorLastName));
+    }
+
     public static BookCreationRequest validRequestOrThrow(BookCreationRequest request) throws ValidationException {
         var errors = new HashSet<String>();
         if (request.title() == null) errors.add("Title is required.");
