@@ -3,7 +3,6 @@ package com.mancel.yann.bookstore_api.data.repositories.impl;
 import com.mancel.yann.bookstore_api.data.models.AuthorModel;
 import com.mancel.yann.bookstore_api.data.repositories.AuthorPersistRepository;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
-import com.mancel.yann.bookstore_api.domain.exceptions.DomainException;
 import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
 import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
 import jakarta.persistence.EntityManager;
@@ -33,8 +32,6 @@ public class AuthorPersistRepositoryImpl implements AuthorPersistRepository {
                     .build();
             entityManager.persist(transientAuthor);
             return transientAuthor.getAuthorEntity();
-        } catch (DomainException exception) {
-            throw exception;
         } catch (Exception exception) {
             throw new UnknownException(exception.getMessage(), exception);
         }

@@ -5,6 +5,7 @@ import com.mancel.yann.bookstore_api.data.models.BookModel;
 import com.mancel.yann.bookstore_api.data.repositories.BookPersistRepository;
 import com.mancel.yann.bookstore_api.domain.entities.BookEntity;
 import com.mancel.yann.bookstore_api.domain.exceptions.DomainException;
+import com.mancel.yann.bookstore_api.domain.exceptions.NoEntityFoundException;
 import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
 import com.mancel.yann.bookstore_api.domain.requests.BookCreationRequest;
 import jakarta.persistence.EntityManager;
@@ -33,8 +34,8 @@ public class BookPersistRepositoryImpl implements BookPersistRepository {
             var persistedAuthor = entityManager.find(AuthorModel.class, request.authorId());
 
             if (persistedAuthor == null) {
-                throw new IllegalArgumentException(
-                        MessageFormat.format("Author model is not found with {0}", request.authorId().toString()));
+                throw new NoEntityFoundException(
+                        MessageFormat.format("Author is not found with {0}", request.authorId().toString()));
             }
 
             var transientBook = BookModel.getBuilder()

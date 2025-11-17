@@ -86,7 +86,7 @@ class AuthorRepositoryTest {
             Given there is a valid request
             When the saveFromRequest method is called
             Then the persistence is success
-            And the persisted author is return
+            And the persisted author is returned
             """)
     @Test
     void test5() {

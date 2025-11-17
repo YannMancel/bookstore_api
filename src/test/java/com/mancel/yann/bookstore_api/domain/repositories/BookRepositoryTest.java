@@ -2,13 +2,17 @@ package com.mancel.yann.bookstore_api.domain.repositories;
 
 import com.mancel.yann.bookstore_api.Fixtures;
 import com.mancel.yann.bookstore_api.domain.entities.BookEntity;
+import com.mancel.yann.bookstore_api.domain.exceptions.DomainException;
+import com.mancel.yann.bookstore_api.domain.exceptions.NoEntityFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
+import static org.assertj.core.api.BDDAssertions.catchThrowable;
 import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssumptions.given;
 
 @DataJpaTest
 class BookRepositoryTest {
@@ -149,5 +153,47 @@ class BookRepositoryTest {
                 .get()
                 .extracting(BookEntity::id)
                 .isEqualTo(Fixtures.Book.BOOK_UUID);
+    }
+
+    @DisplayName("""
+            Given there is a valid request
+            When the saveFromRequest method is called
+            Then the persistence is success
+            And the persisted book is returned
+            """)
+    @Test
+    @Sql({"/scripts/insert_one_author.sql"})
+    void test9() {
+        var request = Fixtures.Book.getValidBookCreationRequest();
+        given(BookEntity.validRequestOrThrow(request))
+                .isEqualTo(request);
+
+        var persistedBook = bookRepository.saveFromRequest(request);
+
+        then(persistedBook)
+                .extracting(BookEntity::id)
+                .isNotNull();
+    }
+
+
+    @DisplayName("""
+            Given there is a valid request
+            But there is no persisted author
+            When the saveFromRequest method is called
+            Then the persistence is failed
+            And a NoEntityFoundException is thrown
+            """)
+    @Test
+    void test10() {
+        var request = Fixtures.Book.getValidBookCreationRequest();
+        given(BookEntity.validRequestOrThrow(request))
+                .isEqualTo(request);
+
+        var thrown = catchThrowable(() -> bookRepository.saveFromRequest(request));
+
+        then(thrown)
+                .isExactlyInstanceOf(NoEntityFoundException.class)
+                .isInstanceOf(DomainException.class)
+                .hasMessage("Author is not found with " + Fixtures.Author.AUTHOR_UUID);
     }
 }

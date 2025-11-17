@@ -4,6 +4,7 @@ import com.mancel.yann.bookstore_api.Fixtures;
 import com.mancel.yann.bookstore_api.data.repositories.BookPersistRepository;
 import com.mancel.yann.bookstore_api.domain.entities.BookEntity;
 import com.mancel.yann.bookstore_api.domain.exceptions.DomainException;
+import com.mancel.yann.bookstore_api.domain.exceptions.NoEntityFoundException;
 import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
 import com.mancel.yann.bookstore_api.domain.requests.BookCreationRequest;
 import org.assertj.core.api.Condition;
@@ -105,7 +106,7 @@ class BookPersistRepositoryTest {
             Given there is a valid request with a random author's id
             When the saveFromRequest method is called
             Then the persistence is fail
-            And an IllegalArgumentException is thrown
+            And a NoEntityFoundException is thrown
             """)
     @Test
     void test4() {
@@ -115,11 +116,8 @@ class BookPersistRepositoryTest {
         var thrown = catchThrowable(() -> bookPersistRepository.saveFromRequest(request));
 
         then(thrown)
-                .isExactlyInstanceOf(UnknownException.class)
+                .isExactlyInstanceOf(NoEntityFoundException.class)
                 .isInstanceOf(DomainException.class)
-                .hasMessage(MessageFormat.format("Author model is not found with {0}", authorId.toString()))
-                .extracting(Throwable::getCause)
-                .isExactlyInstanceOf(IllegalArgumentException.class)
-                .isInstanceOf(RuntimeException.class);
+                .hasMessage(MessageFormat.format("Author is not found with {0}", authorId.toString()));
     }
 }
