@@ -23,14 +23,15 @@ public class AuthorModel {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    public AuthorModel() {}
+    public AuthorModel() {
+    }
+
+    public static Builder getBuilder() {
+        return new DefaultAuthorModelBuilder();
+    }
 
     public AuthorEntity getAuthorEntity() {
-        return new AuthorEntity(
-                getId(),
-                getEmail(),
-                getFirstName(),
-                getLastName());
+        return new AuthorEntity(getId(), getEmail(), getFirstName(), getLastName());
     }
 
     public UUID getId() {
@@ -63,10 +64,6 @@ public class AuthorModel {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public static Builder getBuilder() {
-        return new DefaultAuthorModelBuilder();
     }
 
     @Override

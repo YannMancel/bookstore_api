@@ -1,10 +1,10 @@
 package com.mancel.yann.bookstore_api;
 
+import com.mancel.yann.bookstore_api.data.models.AuthorModel;
+import com.mancel.yann.bookstore_api.data.models.BookModel;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.entities.BookEntity;
 import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
-import com.mancel.yann.bookstore_api.data.models.AuthorModel;
-import com.mancel.yann.bookstore_api.data.models.BookModel;
 import com.mancel.yann.bookstore_api.domain.requests.BookCreationRequest;
 
 import java.util.UUID;
@@ -49,6 +49,7 @@ public class Fixtures {
         public static BookCreationRequest getValidBookCreationRequest() {
             return new BookCreationRequest("Berserk", Author.AUTHOR_UUID);
         }
+
         public static BookModel getTransientBookModel() {
             var request = getValidBookCreationRequest();
             var authorModel = Author.getTransientAuthorModel();

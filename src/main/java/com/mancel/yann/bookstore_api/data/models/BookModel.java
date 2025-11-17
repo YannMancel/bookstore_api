@@ -20,13 +20,15 @@ public class BookModel {
     @ManyToOne(optional = false)
     private AuthorModel author;
 
-    public BookModel() {}
+    public BookModel() {
+    }
+
+    public static Builder getBuilder() {
+        return new DefaultBookModelBuilder();
+    }
 
     public BookEntity getBookEntity() {
-        return new BookEntity(
-                getId(),
-                getTitle(),
-                getAuthor().getAuthorEntity());
+        return new BookEntity(getId(), getTitle(), getAuthor().getAuthorEntity());
     }
 
     public UUID getId() {
@@ -51,10 +53,6 @@ public class BookModel {
 
     public void setAuthor(AuthorModel author) {
         this.author = author;
-    }
-
-    public static Builder getBuilder() {
-        return new DefaultBookModelBuilder();
     }
 
     @Override

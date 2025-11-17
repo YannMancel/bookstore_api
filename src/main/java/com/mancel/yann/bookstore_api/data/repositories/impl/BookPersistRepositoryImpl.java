@@ -28,14 +28,13 @@ public class BookPersistRepositoryImpl implements BookPersistRepository {
 
     @Override
     @Transactional
-    public BookEntity saveFromRequest(BookCreationRequest request) throws DomainException {
+    public BookEntity saveFromRequest(BookCreationRequest request) {
         try {
             var persistedAuthor = entityManager.find(AuthorModel.class, request.authorId());
 
             if (persistedAuthor == null) {
                 throw new IllegalArgumentException(
-                        MessageFormat.format(
-                                "Author model is not found with {0}", request.authorId().toString()));
+                        MessageFormat.format("Author model is not found with {0}", request.authorId().toString()));
             }
 
             var transientBook = BookModel.getBuilder()
@@ -46,8 +45,7 @@ public class BookPersistRepositoryImpl implements BookPersistRepository {
             return transientBook.getBookEntity();
         } catch (DomainException exception) {
             throw exception;
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             throw new UnknownException(exception.getMessage(), exception);
         }
     }

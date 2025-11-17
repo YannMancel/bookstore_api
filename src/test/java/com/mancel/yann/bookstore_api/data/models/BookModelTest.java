@@ -19,8 +19,7 @@ class BookModelTest {
     @Autowired
     TestEntityManager entityManager;
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the books table is empty
             When a JPQL query is called to find all entities
             Then an empty book list is returned
@@ -37,8 +36,7 @@ class BookModelTest {
                 .isEmpty();
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the books table is populated by one book
             When a JPQL query is called to find all entities
             Then a book list is returned
@@ -57,12 +55,11 @@ class BookModelTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(BookModel::getId)
-                        .isEqualTo(Fixtures.Book.BOOK_UUID);
+                .extracting(BookModel::getId)
+                .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the books table is populated by one book
             When a JPQL query is called to find all entities
             And there is a filter on author's UUID of this book
@@ -83,12 +80,11 @@ class BookModelTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(BookModel::getId)
-                        .isEqualTo(Fixtures.Book.BOOK_UUID);
+                .extracting(BookModel::getId)
+                .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the books table is populated by one book
             When a JPQL query is called to find all entities
             And there is a filter on author's UUID with a random value
@@ -108,8 +104,7 @@ class BookModelTest {
                 .isEmpty();
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the books table is populated by one book
             When a JPQL query is called to find all entities
             And there is a filter on book's title with a subtitle of book's title
@@ -131,12 +126,11 @@ class BookModelTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(BookModel::getId)
-                        .isEqualTo(Fixtures.Book.BOOK_UUID);
+                .extracting(BookModel::getId)
+                .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the books table is populated by one book
             When a JPQL query is called to find all entities
             And there is a filter on book's title with a random subtitle
@@ -157,8 +151,7 @@ class BookModelTest {
                 .isEmpty();
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the books table is empty
             When the find method is called with a random UUID
             Then null is returned
@@ -170,8 +163,7 @@ class BookModelTest {
         then(book).isNull();
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the books table is populated by one book
             When the find method is called with the book's UUID
             Then this book is returned
@@ -184,11 +176,10 @@ class BookModelTest {
         then(book)
                 .isNotNull()
                 .extracting(BookModel::getId)
-                    .isEqualTo(Fixtures.Book.BOOK_UUID);
+                .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given there is a persisted author
             And there is a transient book
             When the persist method is called
@@ -203,7 +194,7 @@ class BookModelTest {
         given(persistedAuthor.getId()).isEqualTo(transientBook.getAuthor().getId());
         given(transientBook)
                 .extracting(BookModel::getId)
-                    .isNull();
+                .isNull();
 
         var persistedBook = entityManager.persist(transientBook);
 
@@ -211,6 +202,6 @@ class BookModelTest {
                 .isEqualTo(persistedBook)
                 .isEqualTo(entityManager.find(BookModel.class, persistedBook.getId()))
                 .extracting(BookModel::getId)
-                    .isNotNull();
+                .isNotNull();
     }
 }

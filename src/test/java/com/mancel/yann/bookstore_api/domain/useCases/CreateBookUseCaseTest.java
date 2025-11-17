@@ -1,7 +1,6 @@
 package com.mancel.yann.bookstore_api.domain.useCases;
 
 import com.mancel.yann.bookstore_api.Fixtures;
-import com.mancel.yann.bookstore_api.domain.delegates.ThrowableSupplier;
 import com.mancel.yann.bookstore_api.domain.delegates.TransactionDelegate;
 import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
 import com.mancel.yann.bookstore_api.domain.exceptions.ValidationException;
@@ -21,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.BDDAssertions.catchThrowable;
@@ -39,35 +39,6 @@ class CreateBookUseCaseTest extends MockInjectorTest {
     @InjectMocks
     CreateBookUseCase createBookUseCase;
 
-    @DisplayName(
-            """
-            Given there is a valid request
-            And the persistence will be success
-            When the execute method is called
-            Then the method is executed into transaction
-            And the persisted book is returned
-            """)
-    @Test
-    @Sql({"/scripts/insert_one_author.sql"})
-    void test1() throws ValidationException {
-        var request = Fixtures.Book.getValidBookCreationRequest();
-        BDDMockito.given(mockedBookRepository.saveFromRequest(request))
-                .willReturn(Fixtures.Book.getPersistedBookEntity());
-
-        var persistedBook = createBookUseCase.execute(request);
-
-        BDDMockito.then(fakeTransactionDelegate)
-                .should()
-                .executeIntoTransaction(any(ThrowableSupplier.class));
-        BDDMockito.then(mockedBookRepository)
-                .should()
-                .saveFromRequest(request);
-        BDDMockito.then(mockedBookRepository)
-                .shouldHaveNoMoreInteractions();
-        BDDAssertions.then(persistedBook)
-                .isEqualTo(Fixtures.Book.getPersistedBookEntity());
-    }
-
     static Stream<Arguments> invalidRequestGenerator() {
         return Stream.of(
                 arguments(
@@ -78,8 +49,35 @@ class CreateBookUseCaseTest extends MockInjectorTest {
                         "Author id is required."));
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
+            Given there is a valid request
+            And the persistence will be success
+            When the execute method is called
+            Then the method is executed into transaction
+            And the persisted book is returned
+            """)
+    @Test
+    @Sql({"/scripts/insert_one_author.sql"})
+    void test1() {
+        var request = Fixtures.Book.getValidBookCreationRequest();
+        BDDMockito.given(mockedBookRepository.saveFromRequest(request))
+                .willReturn(Fixtures.Book.getPersistedBookEntity());
+
+        var persistedBook = createBookUseCase.execute(request);
+
+        BDDMockito.then(fakeTransactionDelegate)
+                .should()
+                .execute(any(Supplier.class));
+        BDDMockito.then(mockedBookRepository)
+                .should()
+                .saveFromRequest(request);
+        BDDMockito.then(mockedBookRepository)
+                .shouldHaveNoMoreInteractions();
+        BDDAssertions.then(persistedBook)
+                .isEqualTo(Fixtures.Book.getPersistedBookEntity());
+    }
+
+    @DisplayName("""
             Given there is an invalid request
             When the execute method is called
             Then the method is executed into transaction
@@ -93,7 +91,7 @@ class CreateBookUseCaseTest extends MockInjectorTest {
 
         BDDMockito.then(fakeTransactionDelegate)
                 .should()
-                .executeIntoTransaction(any(ThrowableSupplier.class));
+                .execute(any(Supplier.class));
         BDDMockito.then(mockedBookRepository)
                 .shouldHaveNoInteractions();
         BDDAssertions.then(thrown)
@@ -101,8 +99,7 @@ class CreateBookUseCaseTest extends MockInjectorTest {
                 .hasMessageContaining(errorMessage);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given a valid request
             And the persistence will be fail
             When the execute method is called
@@ -121,7 +118,7 @@ class CreateBookUseCaseTest extends MockInjectorTest {
 
         BDDMockito.then(fakeTransactionDelegate)
                 .should()
-                .executeIntoTransaction(any(ThrowableSupplier.class));
+                .execute(any(Supplier.class));
         BDDMockito.then(mockedBookRepository)
                 .should()
                 .saveFromRequest(request);

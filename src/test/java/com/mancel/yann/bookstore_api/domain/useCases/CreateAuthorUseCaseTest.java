@@ -1,22 +1,25 @@
 package com.mancel.yann.bookstore_api.domain.useCases;
 
 import com.mancel.yann.bookstore_api.Fixtures;
-import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
-import com.mancel.yann.bookstore_api.mocks.MockInjectorTest;
-import com.mancel.yann.bookstore_api.domain.delegates.ThrowableSupplier;
-import com.mancel.yann.bookstore_api.domain.exceptions.ValidationException;
 import com.mancel.yann.bookstore_api.domain.delegates.TransactionDelegate;
+import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
+import com.mancel.yann.bookstore_api.domain.exceptions.ValidationException;
 import com.mancel.yann.bookstore_api.domain.repositories.AuthorRepository;
 import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
 import com.mancel.yann.bookstore_api.mocks.FakeTransactionDelegate;
+import com.mancel.yann.bookstore_api.mocks.MockInjectorTest;
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.*;
+import org.mockito.BDDMockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.BDDAssertions.catchThrowable;
@@ -35,34 +38,6 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
     @InjectMocks
     CreateAuthorUseCase createAuthorUseCase;
 
-    @DisplayName(
-            """
-            Given there is a valid request
-            And the persistence will be success
-            When the execute method is called
-            Then the method is executed into transaction
-            And the persisted author is returned
-            """)
-    @Test
-    void test1() throws ValidationException {
-        var request = Fixtures.Author.getValidAuthorCreationRequest();
-        BDDMockito.given(mockedAuthorRepository.saveFromRequest(request))
-                .willReturn(Fixtures.Author.getPersistedAuthorEntity());
-
-        var persistedAuthor = createAuthorUseCase.execute(request);
-
-        BDDMockito.then(fakeTransactionDelegate)
-                .should()
-                .executeIntoTransaction(any(ThrowableSupplier.class));
-        BDDMockito.then(mockedAuthorRepository)
-                .should()
-                .saveFromRequest(request);
-        BDDMockito.then(mockedAuthorRepository)
-                .shouldHaveNoMoreInteractions();
-        BDDAssertions.then(persistedAuthor)
-                .isEqualTo(Fixtures.Author.getPersistedAuthorEntity());
-    }
-
     static Stream<Arguments> invalidRequestGenerator() {
         return Stream.of(
                 arguments(
@@ -73,8 +48,34 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
                         "Last name is required."));
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
+            Given there is a valid request
+            And the persistence will be success
+            When the execute method is called
+            Then the method is executed into transaction
+            And the persisted author is returned
+            """)
+    @Test
+    void test1() {
+        var request = Fixtures.Author.getValidAuthorCreationRequest();
+        BDDMockito.given(mockedAuthorRepository.saveFromRequest(request))
+                .willReturn(Fixtures.Author.getPersistedAuthorEntity());
+
+        var persistedAuthor = createAuthorUseCase.execute(request);
+
+        BDDMockito.then(fakeTransactionDelegate)
+                .should()
+                .execute(any(Supplier.class));
+        BDDMockito.then(mockedAuthorRepository)
+                .should()
+                .saveFromRequest(request);
+        BDDMockito.then(mockedAuthorRepository)
+                .shouldHaveNoMoreInteractions();
+        BDDAssertions.then(persistedAuthor)
+                .isEqualTo(Fixtures.Author.getPersistedAuthorEntity());
+    }
+
+    @DisplayName("""
             Given there is an invalid request
             When the execute method is called
             Then the method is executed into transaction
@@ -88,7 +89,7 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
 
         BDDMockito.then(fakeTransactionDelegate)
                 .should()
-                .executeIntoTransaction(any(ThrowableSupplier.class));
+                .execute(any(Supplier.class));
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoInteractions();
         BDDAssertions.then(thrown)
@@ -96,8 +97,7 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
                 .hasMessageContaining(errorMessage);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given a valid request
             And the persistence will be fail
             When the execute method is called
@@ -116,7 +116,7 @@ class CreateAuthorUseCaseTest extends MockInjectorTest {
 
         BDDMockito.then(fakeTransactionDelegate)
                 .should()
-                .executeIntoTransaction(any(ThrowableSupplier.class));
+                .execute(any(Supplier.class));
         BDDMockito.then(mockedAuthorRepository)
                 .should()
                 .saveFromRequest(request);

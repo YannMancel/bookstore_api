@@ -17,8 +17,7 @@ class AuthorModelTest {
     @Autowired
     TestEntityManager entityManager;
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is empty
             When a JPQL query is called to find all authors
             Then an empty list is returned
@@ -35,8 +34,7 @@ class AuthorModelTest {
                 .isEmpty();
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is populated by one author
             When a JPQL query is called to find all authors
             Then an list is returned with this author
@@ -54,12 +52,11 @@ class AuthorModelTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(AuthorModel::getId)
-                        .isEqualTo(Fixtures.Author.AUTHOR_UUID);
+                .extracting(AuthorModel::getId)
+                .isEqualTo(Fixtures.Author.AUTHOR_UUID);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is empty
             When the find method is called with a random id
             Then null is returned
@@ -71,8 +68,7 @@ class AuthorModelTest {
         then(author).isNull();
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is populated by one author
             When the find method is called with the author's id
             Then this author is returned
@@ -85,11 +81,10 @@ class AuthorModelTest {
         then(author)
                 .isNotNull()
                 .extracting(AuthorModel::getId)
-                    .isEqualTo(Fixtures.Author.AUTHOR_UUID);
+                .isEqualTo(Fixtures.Author.AUTHOR_UUID);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given there is a transient author
             When the persist method is called
             Then the persistence is success
@@ -100,7 +95,7 @@ class AuthorModelTest {
         var transientAuthor = Fixtures.Author.getTransientAuthorModel();
         given(transientAuthor)
                 .extracting(AuthorModel::getId)
-                    .isNull();
+                .isNull();
 
         var persistedAuthor = entityManager.persist(transientAuthor);
 
@@ -108,6 +103,6 @@ class AuthorModelTest {
                 .isEqualTo(persistedAuthor)
                 .isEqualTo(entityManager.find(AuthorModel.class, persistedAuthor.getId()))
                 .extracting(AuthorModel::getId)
-                    .isNotNull();
+                .isNotNull();
     }
 }

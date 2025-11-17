@@ -17,7 +17,7 @@ public record BookEntity(UUID id, String title, AuthorEntity author) {
         this(id, title, new AuthorEntity(authorId, authorEmail, authorFirstName, authorLastName));
     }
 
-    public static BookCreationRequest validRequestOrThrow(BookCreationRequest request) throws ValidationException {
+    public static BookCreationRequest validRequestOrThrow(BookCreationRequest request) {
         var errors = new HashSet<String>();
         if (request.title() == null) errors.add("Title is required.");
         if (request.authorId() == null) errors.add("Author id is required.");

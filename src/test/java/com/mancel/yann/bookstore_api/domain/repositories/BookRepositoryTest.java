@@ -16,8 +16,7 @@ class BookRepositoryTest {
     @Autowired
     BookRepository bookRepository;
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is empty
             When the findAll method is called
             Then an empty list is returned
@@ -31,8 +30,7 @@ class BookRepositoryTest {
                 .isEmpty();
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is populated by one book
             When the findAll method is called
             Then a list is returned with this book
@@ -47,12 +45,11 @@ class BookRepositoryTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(BookEntity::id)
-                        .isEqualTo(Fixtures.Book.BOOK_UUID);
+                .extracting(BookEntity::id)
+                .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is populated by one book
             When the findAllByAuthorId method is called with the book's id
             Then a list is returned with this book
@@ -67,12 +64,11 @@ class BookRepositoryTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(BookEntity::id)
-                        .isEqualTo(Fixtures.Book.BOOK_UUID);
+                .extracting(BookEntity::id)
+                .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is populated by one book
             When the findAllByAuthorId method is called with a random id
             Then an empty list is returned
@@ -87,8 +83,7 @@ class BookRepositoryTest {
                 .isEmpty();
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is populated by one book
             When the findAllByTitleContaining method is called with a subtitle of book's title
             Then a list is returned with this book
@@ -103,12 +98,11 @@ class BookRepositoryTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(BookEntity::id)
-                        .isEqualTo(Fixtures.Book.BOOK_UUID);
+                .extracting(BookEntity::id)
+                .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is populated by one book
             When the findAllByTitleContaining method is called with a random subtitle
             Then an empty list is returned
@@ -125,8 +119,7 @@ class BookRepositoryTest {
                 .isEmpty();
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is empty
             When the findById method is called with a random id
             Then an empty optional is returned
@@ -140,8 +133,7 @@ class BookRepositoryTest {
                 .isEmpty();
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is populated by one book
             When the findById method is called with the book's id
             Then an optional is returned with this book
@@ -155,7 +147,7 @@ class BookRepositoryTest {
                 .isNotNull()
                 .isNotEmpty()
                 .get()
-                    .extracting(BookEntity::id)
-                        .isEqualTo(Fixtures.Book.BOOK_UUID);
+                .extracting(BookEntity::id)
+                .isEqualTo(Fixtures.Book.BOOK_UUID);
     }
 }

@@ -16,23 +16,21 @@ class JpaTransactionDelegateTest {
 
     private final TransactionDelegate jpaTransactionDelegate = new JpaTransactionDelegate();
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given there is a not throwing lambda
             When the executeIntoTransaction method is called
             Then the correct result is returned
             """)
     @Test
-    void test1() throws DomainException {
+    void test1() {
         var uuid = Fixtures.getRandomUUID();
 
-        var result = jpaTransactionDelegate.executeIntoTransaction(() -> uuid);
+        var result = jpaTransactionDelegate.execute(() -> uuid);
 
         then(result).isEqualTo(uuid);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given there is a throwing lambda
             And the exception is not a DomainException
             When the executeIntoTransaction method is called
@@ -46,7 +44,7 @@ class JpaTransactionDelegateTest {
                 .isInstanceOf(Exception.class)
                 .isNotInstanceOf(DomainException.class);
 
-        var thrown = catchThrowable(() -> jpaTransactionDelegate.executeIntoTransaction(() -> {
+        var thrown = catchThrowable(() -> jpaTransactionDelegate.execute(() -> {
             throw exception;
         }));
 
@@ -57,8 +55,7 @@ class JpaTransactionDelegateTest {
                 .hasCause(exception);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given there is a throwing lambda
             And the exception is a DomainException
             When the executeIntoTransaction method is called
@@ -69,7 +66,7 @@ class JpaTransactionDelegateTest {
         var exception = new ValidationException("");
         given(exception).isInstanceOf(DomainException.class);
 
-        var thrown = catchThrowable(() -> jpaTransactionDelegate.executeIntoTransaction(() -> {
+        var thrown = catchThrowable(() -> jpaTransactionDelegate.execute(() -> {
             throw exception;
         }));
 

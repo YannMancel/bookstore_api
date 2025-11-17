@@ -34,8 +34,7 @@ class BookPersistRepositoryTest {
                 entity.author().id());
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given there is a valid request
             When the saveFromRequest method is called
             Then the persistence is success
@@ -51,14 +50,13 @@ class BookPersistRepositoryTest {
         then(persistedBook)
                 .isNotNull()
                 .is(new Condition<>(
-                        book -> convertEntityToRequest(book).equals(request),
+                        entity -> convertEntityToRequest(entity).equals(request),
                         "is equal to the request"))
                 .extracting(BookEntity::id)
-                    .isNotNull();
+                .isNotNull();
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given there is a invalid request with title equals to null
             When the saveFromRequest method is called
             Then the persistence is fail
@@ -77,13 +75,12 @@ class BookPersistRepositoryTest {
                 .hasMessageStartingWith("not-null property references a null or transient value")
                 .hasMessageEndingWith("BookModel.title")
                 .extracting(Throwable::getCause)
-                    .isExactlyInstanceOf(PropertyValueException.class)
-                    .isInstanceOf(HibernateException.class)
-                    .isInstanceOf(RuntimeException.class);
+                .isExactlyInstanceOf(PropertyValueException.class)
+                .isInstanceOf(HibernateException.class)
+                .isInstanceOf(RuntimeException.class);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given there is a invalid request with author's id equals to null
             When the saveFromRequest method is called
             Then the persistence is fail
@@ -100,12 +97,11 @@ class BookPersistRepositoryTest {
                 .isInstanceOf(DomainException.class)
                 .hasMessage("id to load is required for loading")
                 .extracting(Throwable::getCause)
-                    .isExactlyInstanceOf(IllegalArgumentException.class)
-                    .isInstanceOf(RuntimeException.class);
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RuntimeException.class);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given there is a valid request with a random author's id
             When the saveFromRequest method is called
             Then the persistence is fail
@@ -123,7 +119,7 @@ class BookPersistRepositoryTest {
                 .isInstanceOf(DomainException.class)
                 .hasMessage(MessageFormat.format("Author model is not found with {0}", authorId.toString()))
                 .extracting(Throwable::getCause)
-                    .isExactlyInstanceOf(IllegalArgumentException.class)
-                    .isInstanceOf(RuntimeException.class);
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RuntimeException.class);
     }
 }

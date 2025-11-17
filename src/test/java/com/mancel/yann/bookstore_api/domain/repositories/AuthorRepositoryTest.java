@@ -17,8 +17,7 @@ class AuthorRepositoryTest {
     @Autowired
     AuthorRepository authorRepository;
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is empty
             When the findAll method is called
             Then an empty list is returned
@@ -32,8 +31,7 @@ class AuthorRepositoryTest {
                 .isEmpty();
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is populated by one author
             When the findAll method is called
             Then a list is returned with this author
@@ -48,12 +46,11 @@ class AuthorRepositoryTest {
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(AuthorEntity::id)
-                        .isEqualTo(Fixtures.Author.AUTHOR_UUID);
+                .extracting(AuthorEntity::id)
+                .isEqualTo(Fixtures.Author.AUTHOR_UUID);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is empty
             When the findById method is called with a random id
             Then an empty optional is returned
@@ -67,8 +64,7 @@ class AuthorRepositoryTest {
                 .isEmpty();
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given the table is populated by one author
             When the findById method is called with the author's id
             Then an optional is returned with this author
@@ -82,12 +78,11 @@ class AuthorRepositoryTest {
                 .isNotNull()
                 .isNotEmpty()
                 .get()
-                    .extracting(AuthorEntity::id)
-                        .isEqualTo(Fixtures.Author.AUTHOR_UUID);
+                .extracting(AuthorEntity::id)
+                .isEqualTo(Fixtures.Author.AUTHOR_UUID);
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given there is a valid request
             When the saveFromRequest method is called
             Then the persistence is success
@@ -103,6 +98,6 @@ class AuthorRepositoryTest {
 
         then(persistedAuthor)
                 .extracting(AuthorEntity::id)
-                    .isNotNull();
+                .isNotNull();
     }
 }

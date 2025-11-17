@@ -31,6 +31,16 @@ class AuthorPersistRepositoryTest {
     @Qualifier("authorPersistRepositoryImpl")
     AuthorPersistRepository authorPersistRepository;
 
+    static Stream<Arguments> invalidRequestGenerator() {
+        return Stream.of(
+                arguments(
+                        new AuthorCreationRequest("john.doe@gmail.com", null, "Doe"),
+                        "firstName"),
+                arguments(
+                        new AuthorCreationRequest("john.doe@gmail.com", "John", null),
+                        "lastName"));
+    }
+
     AuthorCreationRequest convertEntityToRequest(AuthorEntity entity) {
         return new AuthorCreationRequest(
                 entity.email(),
@@ -38,8 +48,7 @@ class AuthorPersistRepositoryTest {
                 entity.lastName());
     }
 
-    @DisplayName(
-            """
+    @DisplayName("""
             Given there is a valid request
             When the saveFromRequest method is called
             Then the persistence is success
@@ -57,21 +66,10 @@ class AuthorPersistRepositoryTest {
                         author -> convertEntityToRequest(author).equals(request),
                         "is equal to the request"))
                 .extracting(AuthorEntity::id)
-                    .isNotNull();
+                .isNotNull();
     }
 
-    static Stream<Arguments> invalidRequestGenerator() {
-        return Stream.of(
-                arguments(
-                        new AuthorCreationRequest("john.doe@gmail.com", null, "Doe"),
-                        "firstName"),
-                arguments(
-                        new AuthorCreationRequest("john.doe@gmail.com", "John", null),
-                        "lastName"));
-    }
-
-    @DisplayName(
-            """
+    @DisplayName("""
             Given there is a invalid request
             When the saveFromRequest method is called
             Then the persistence is fail
@@ -88,8 +86,8 @@ class AuthorPersistRepositoryTest {
                 .hasMessageStartingWith("not-null property references a null or transient value")
                 .hasMessageEndingWith("AuthorModel." + propertyName)
                 .extracting(Throwable::getCause)
-                    .isExactlyInstanceOf(PropertyValueException.class)
-                    .isInstanceOf(HibernateException.class)
-                    .isInstanceOf(RuntimeException.class);
+                .isExactlyInstanceOf(PropertyValueException.class)
+                .isInstanceOf(HibernateException.class)
+                .isInstanceOf(RuntimeException.class);
     }
 }

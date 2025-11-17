@@ -1,11 +1,11 @@
 package com.mancel.yann.bookstore_api.data.repositories.impl;
 
+import com.mancel.yann.bookstore_api.data.models.AuthorModel;
 import com.mancel.yann.bookstore_api.data.repositories.AuthorPersistRepository;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.exceptions.DomainException;
 import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
 import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
-import com.mancel.yann.bookstore_api.data.models.AuthorModel;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaContext;
@@ -24,7 +24,7 @@ public class AuthorPersistRepositoryImpl implements AuthorPersistRepository {
 
     @Override
     @Transactional
-    public AuthorEntity saveFromRequest(AuthorCreationRequest request) throws DomainException {
+    public AuthorEntity saveFromRequest(AuthorCreationRequest request) {
         try {
             var transientAuthor = AuthorModel.getBuilder()
                     .setEmail(request.email())

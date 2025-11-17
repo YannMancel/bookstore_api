@@ -28,18 +28,12 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public CreateUseCase<AuthorCreationRequest, AuthorEntity> createAuthorUseCase(
-            TransactionDelegate transactionDelegate,
-            AuthorRepository authorRepository
-    ) {
+    public CreateUseCase<AuthorCreationRequest, AuthorEntity> createAuthorUseCase(TransactionDelegate transactionDelegate, AuthorRepository authorRepository) {
         return new CreateAuthorUseCase(transactionDelegate, authorRepository);
     }
 
     @Bean
-    public CreateUseCase<BookCreationRequest, BookEntity> createBookUseCase(
-            TransactionDelegate transactionDelegate,
-            BookRepository bookRepository
-    ) {
+    public CreateUseCase<BookCreationRequest, BookEntity> createBookUseCase(TransactionDelegate transactionDelegate, BookRepository bookRepository) {
         return new CreateBookUseCase(transactionDelegate, bookRepository);
     }
 }
