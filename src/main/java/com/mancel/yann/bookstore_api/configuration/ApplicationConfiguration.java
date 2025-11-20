@@ -10,6 +10,7 @@ import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
 import com.mancel.yann.bookstore_api.domain.requests.BookCreationRequest;
 import com.mancel.yann.bookstore_api.domain.useCases.*;
 import com.mancel.yann.bookstore_api.domain.useCases.impl.FindAllAuthorsUseCase;
+import com.mancel.yann.bookstore_api.domain.useCases.impl.FindByAuthorIdUseCase;
 import com.mancel.yann.bookstore_api.domain.useCases.impl.SaveAuthorUseCase;
 import com.mancel.yann.bookstore_api.domain.useCases.impl.SaveBookUseCase;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -41,5 +42,10 @@ public class ApplicationConfiguration {
     @Bean
     public FindAllUseCase<AuthorEntity> findAllAuthorsIdUseCase(AuthorRepository authorRepository) {
         return new FindAllAuthorsUseCase(authorRepository);
+    }
+
+    @Bean
+    public FindByIdUseCase<AuthorEntity> findByAuthorIdUseCase(AuthorRepository authorRepository) {
+        return new FindByAuthorIdUseCase(authorRepository);
     }
 }
