@@ -109,7 +109,7 @@ class SaveBookUseCaseTest extends MockInjectorTest {
             And a DomainException is thrown
             """)
     @Test
-    void test3() throws ValidationException {
+    void test3() {
         var request = Fixtures.Book.getValidBookCreationRequest();
         var exception = new UnknownException("foo", new Exception("bar"));
         BDDMockito.given(mockedBookRepository.saveFromRequest(request))
