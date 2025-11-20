@@ -8,9 +8,9 @@ import com.mancel.yann.bookstore_api.domain.repositories.AuthorRepository;
 import com.mancel.yann.bookstore_api.domain.repositories.BookRepository;
 import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
 import com.mancel.yann.bookstore_api.domain.requests.BookCreationRequest;
-import com.mancel.yann.bookstore_api.domain.useCases.CreateAuthorUseCase;
-import com.mancel.yann.bookstore_api.domain.useCases.CreateBookUseCase;
-import com.mancel.yann.bookstore_api.domain.useCases.CreateUseCase;
+import com.mancel.yann.bookstore_api.domain.useCases.*;
+import com.mancel.yann.bookstore_api.domain.useCases.impl.SaveAuthorUseCase;
+import com.mancel.yann.bookstore_api.domain.useCases.impl.SaveBookUseCase;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,12 +28,12 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public CreateUseCase<AuthorCreationRequest, AuthorEntity> createAuthorUseCase(TransactionDelegate transactionDelegate, AuthorRepository authorRepository) {
-        return new CreateAuthorUseCase(transactionDelegate, authorRepository);
+    public SaveUseCase<AuthorCreationRequest, AuthorEntity> createAuthorUseCase(TransactionDelegate transactionDelegate, AuthorRepository authorRepository) {
+        return new SaveAuthorUseCase(transactionDelegate, authorRepository);
     }
 
     @Bean
-    public CreateUseCase<BookCreationRequest, BookEntity> createBookUseCase(TransactionDelegate transactionDelegate, BookRepository bookRepository) {
-        return new CreateBookUseCase(transactionDelegate, bookRepository);
+    public SaveUseCase<BookCreationRequest, BookEntity> createBookUseCase(TransactionDelegate transactionDelegate, BookRepository bookRepository) {
+        return new SaveBookUseCase(transactionDelegate, bookRepository);
     }
 }

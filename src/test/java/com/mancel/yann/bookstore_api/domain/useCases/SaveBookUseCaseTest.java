@@ -6,6 +6,7 @@ import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
 import com.mancel.yann.bookstore_api.domain.exceptions.ValidationException;
 import com.mancel.yann.bookstore_api.domain.repositories.BookRepository;
 import com.mancel.yann.bookstore_api.domain.requests.BookCreationRequest;
+import com.mancel.yann.bookstore_api.domain.useCases.impl.SaveBookUseCase;
 import com.mancel.yann.bookstore_api.mocks.FakeTransactionDelegate;
 import com.mancel.yann.bookstore_api.mocks.MockInjectorTest;
 import org.assertj.core.api.BDDAssertions;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 
 @SuppressWarnings("unchecked")
-class CreateBookUseCaseTest extends MockInjectorTest {
+class SaveBookUseCaseTest extends MockInjectorTest {
 
     @Spy
     TransactionDelegate fakeTransactionDelegate = new FakeTransactionDelegate();
@@ -37,7 +38,7 @@ class CreateBookUseCaseTest extends MockInjectorTest {
     BookRepository mockedBookRepository;
 
     @InjectMocks
-    CreateBookUseCase createBookUseCase;
+    SaveBookUseCase saveBookUseCase;
 
     static Stream<Arguments> invalidRequestGenerator() {
         return Stream.of(
@@ -63,7 +64,7 @@ class CreateBookUseCaseTest extends MockInjectorTest {
         BDDMockito.given(mockedBookRepository.saveFromRequest(request))
                 .willReturn(Fixtures.Book.getPersistedBookEntity());
 
-        var persistedBook = createBookUseCase.execute(request);
+        var persistedBook = saveBookUseCase.execute(request);
 
         BDDMockito.then(fakeTransactionDelegate)
                 .should()
@@ -87,7 +88,7 @@ class CreateBookUseCaseTest extends MockInjectorTest {
     @ParameterizedTest
     @MethodSource("invalidRequestGenerator")
     void test2(BookCreationRequest request, String errorMessage) {
-        var thrown = catchThrowable(() -> createBookUseCase.execute(request));
+        var thrown = catchThrowable(() -> saveBookUseCase.execute(request));
 
         BDDMockito.then(fakeTransactionDelegate)
                 .should()
@@ -114,7 +115,7 @@ class CreateBookUseCaseTest extends MockInjectorTest {
         BDDMockito.given(mockedBookRepository.saveFromRequest(request))
                 .willThrow(exception);
 
-        var thrown = catchThrowable(() -> createBookUseCase.execute(request));
+        var thrown = catchThrowable(() -> saveBookUseCase.execute(request));
 
         BDDMockito.then(fakeTransactionDelegate)
                 .should()

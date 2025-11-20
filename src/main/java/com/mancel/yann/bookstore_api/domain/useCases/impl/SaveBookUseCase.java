@@ -1,12 +1,13 @@
-package com.mancel.yann.bookstore_api.domain.useCases;
+package com.mancel.yann.bookstore_api.domain.useCases.impl;
 
 import com.mancel.yann.bookstore_api.domain.delegates.TransactionDelegate;
 import com.mancel.yann.bookstore_api.domain.entities.BookEntity;
 import com.mancel.yann.bookstore_api.domain.repositories.BookRepository;
 import com.mancel.yann.bookstore_api.domain.requests.BookCreationRequest;
+import com.mancel.yann.bookstore_api.domain.useCases.SaveUseCase;
 
-public record CreateBookUseCase(TransactionDelegate transactionDelegate,
-                                BookRepository bookRepository) implements CreateUseCase<BookCreationRequest, BookEntity> {
+public record SaveBookUseCase(TransactionDelegate transactionDelegate,
+                              BookRepository bookRepository) implements SaveUseCase<BookCreationRequest, BookEntity> {
 
     @Override
     public BookEntity execute(BookCreationRequest request) {
