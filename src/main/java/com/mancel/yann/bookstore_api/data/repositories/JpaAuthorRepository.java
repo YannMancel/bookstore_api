@@ -5,12 +5,14 @@ import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.repositories.AuthorRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @org.springframework.stereotype.Repository
+@Transactional(readOnly = true)
 public interface JpaAuthorRepository extends AuthorRepository, AuthorPersistRepository, Repository<AuthorModel, UUID> {
 
     @Override

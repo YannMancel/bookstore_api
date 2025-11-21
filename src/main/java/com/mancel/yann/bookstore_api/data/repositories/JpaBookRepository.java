@@ -5,12 +5,14 @@ import com.mancel.yann.bookstore_api.domain.repositories.BookRepository;
 import com.mancel.yann.bookstore_api.data.models.BookModel;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @org.springframework.stereotype.Repository
+@Transactional(readOnly = true)
 public interface JpaBookRepository extends BookRepository, BookPersistRepository, Repository<BookModel, UUID> {
 
     @Override
