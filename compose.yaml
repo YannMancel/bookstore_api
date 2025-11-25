@@ -1,0 +1,16 @@
+services:
+  dev-db:
+    image: postgres:15-alpine
+    container_name: dev-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: yann
+      POSTGRES_PASSWORD: api
+      POSTGRES_DB: dev-database
+
+  ihm-db:
+    image: adminer:5.4.1-standalone
+    container_name: ihm-postgres
+    ports:
+      - "9090:8080"
