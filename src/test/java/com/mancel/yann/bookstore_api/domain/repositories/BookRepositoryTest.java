@@ -3,7 +3,7 @@ package com.mancel.yann.bookstore_api.domain.repositories;
 import com.mancel.yann.bookstore_api.Fixtures;
 import com.mancel.yann.bookstore_api.domain.entities.BookEntity;
 import com.mancel.yann.bookstore_api.domain.exceptions.DomainException;
-import com.mancel.yann.bookstore_api.domain.exceptions.NoEntityFoundException;
+import com.mancel.yann.bookstore_api.domain.exceptions.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -192,7 +192,7 @@ class BookRepositoryTest {
         var thrown = catchThrowable(() -> bookRepository.saveFromRequest(request));
 
         then(thrown)
-                .isExactlyInstanceOf(NoEntityFoundException.class)
+                .isExactlyInstanceOf(EntityNotFoundException.class)
                 .isInstanceOf(DomainException.class)
                 .hasMessage("Author is not found with " + Fixtures.Author.AUTHOR_UUID);
     }

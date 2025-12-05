@@ -9,7 +9,7 @@ import com.mancel.yann.bookstore_api.domain.requests.BookCreationRequest;
 
 import java.util.UUID;
 
-public class Fixtures {
+public abstract class Fixtures {
 
     public static UUID getRandomUUID() {
         return UUID.randomUUID();

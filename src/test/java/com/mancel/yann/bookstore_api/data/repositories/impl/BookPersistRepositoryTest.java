@@ -4,10 +4,9 @@ import com.mancel.yann.bookstore_api.Fixtures;
 import com.mancel.yann.bookstore_api.data.repositories.BookPersistRepository;
 import com.mancel.yann.bookstore_api.domain.entities.BookEntity;
 import com.mancel.yann.bookstore_api.domain.exceptions.DomainException;
-import com.mancel.yann.bookstore_api.domain.exceptions.NoEntityFoundException;
+import com.mancel.yann.bookstore_api.domain.exceptions.EntityNotFoundException;
 import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
 import com.mancel.yann.bookstore_api.domain.requests.BookCreationRequest;
-import org.assertj.core.api.Condition;
 import org.hibernate.HibernateException;
 import org.hibernate.PropertyValueException;
 import org.junit.jupiter.api.DisplayName;
@@ -50,9 +49,8 @@ class BookPersistRepositoryTest {
 
         then(persistedBook)
                 .isNotNull()
-                .is(new Condition<>(
-                        entity -> convertEntityToRequest(entity).equals(request),
-                        "is equal to the request"))
+                .matches(entity -> convertEntityToRequest(entity).equals(request),
+                        "is equal to the request")
                 .extracting(BookEntity::id)
                 .isNotNull();
     }
@@ -116,7 +114,7 @@ class BookPersistRepositoryTest {
         var thrown = catchThrowable(() -> bookPersistRepository.saveFromRequest(request));
 
         then(thrown)
-                .isExactlyInstanceOf(NoEntityFoundException.class)
+                .isExactlyInstanceOf(EntityNotFoundException.class)
                 .isInstanceOf(DomainException.class)
                 .hasMessage(MessageFormat.format("Author is not found with {0}", authorId.toString()));
     }

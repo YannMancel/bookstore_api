@@ -2,7 +2,7 @@ package com.mancel.yann.bookstore_api.domain.useCases;
 
 import com.mancel.yann.bookstore_api.Fixtures;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
-import com.mancel.yann.bookstore_api.domain.exceptions.NoEntityFoundException;
+import com.mancel.yann.bookstore_api.domain.exceptions.EntityNotFoundException;
 import com.mancel.yann.bookstore_api.domain.repositories.AuthorRepository;
 import com.mancel.yann.bookstore_api.domain.useCases.impl.FindByAuthorIdUseCase;
 import com.mancel.yann.bookstore_api.mocks.MockInjectorTest;
@@ -67,7 +67,7 @@ class FindByAuthorIdUseCaseTest extends MockInjectorTest {
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
         BDDAssertions.then(thrown)
-                .isExactlyInstanceOf(NoEntityFoundException.class)
+                .isExactlyInstanceOf(EntityNotFoundException.class)
                 .hasMessage(MessageFormat.format("Author is not found with {0}", uuid.toString()));
     }
 }

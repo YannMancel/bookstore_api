@@ -6,7 +6,6 @@ import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.exceptions.DomainException;
 import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
 import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
-import org.assertj.core.api.Condition;
 import org.hibernate.HibernateException;
 import org.hibernate.PropertyValueException;
 import org.junit.jupiter.api.DisplayName;
@@ -62,9 +61,8 @@ class AuthorPersistRepositoryTest {
 
         then(persistedAuthor)
                 .isNotNull()
-                .is(new Condition<>(
-                        author -> convertEntityToRequest(author).equals(request),
-                        "is equal to the request"))
+                .matches(entity -> convertEntityToRequest(entity).equals(request),
+                        "is equal to the request")
                 .extracting(AuthorEntity::id)
                 .isNotNull();
     }
