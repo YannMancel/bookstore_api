@@ -1,0 +1,17 @@
+### GET /v1/authors
+GET {{baseUrl}}/v1/authors
+Accept: application/json
+
+### GET /v1/authors/{id}
+GET {{baseUrl}}/v1/authors/64f07a63-1c1c-415e-b2c7-6a54860e6083
+Accept: application/json
+
+### POST /v1/authors
+POST {{baseUrl}}/v1/authors
+Content-Type: application/json
+
+{
+    "email" : "foo@gmail.com",
+    "firstName": "foo",
+    "lastName": "bar"
+}
