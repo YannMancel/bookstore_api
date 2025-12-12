@@ -11,7 +11,7 @@ POST {{baseUrl}}/v1/authors
 Content-Type: application/json
 
 {
-    "email" : "foo@gmail.com",
-    "firstName": "foo",
-    "lastName": "bar"
+    "email" : "alain.damasio@gmail.com",
+    "firstName": "Alain",
+    "lastName": "Damasio"
 }
