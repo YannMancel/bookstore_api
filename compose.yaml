@@ -2,15 +2,29 @@ services:
   dev-db:
     image: postgres:15-alpine
     container_name: dev-postgres
+    volumes:
+      - dev_postgres_data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: yann
       POSTGRES_PASSWORD: api
       POSTGRES_DB: dev-database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 3s
 
   ihm-db:
     image: adminer:5.4.1-standalone
-    container_name: ihm-postgres
+    container_name: adminer
     ports:
       - "9090:8080"
+    depends_on:
+      dev-db:
+        condition: service_healthy
+
+volumes:
+  dev_postgres_data:

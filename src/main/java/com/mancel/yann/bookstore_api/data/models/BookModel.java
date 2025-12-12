@@ -8,7 +8,9 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(name = "books")
+@Table(
+        name = "books",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"title", "author_id"}))
 public class BookModel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
