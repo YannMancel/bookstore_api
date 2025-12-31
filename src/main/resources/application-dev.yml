@@ -27,3 +27,15 @@ logging:
         orm:
           jdbc:
             bind: TRACE
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    configprops:
+      show-values: always
+    env:
+      show-values: always
