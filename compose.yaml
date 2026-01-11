@@ -1,5 +1,8 @@
+volumes:
+  dev_postgres_data: {}
+
 services:
-  database:
+  postgres:
     image: postgres:15-alpine
     container_name: postgres
     volumes:
@@ -17,16 +20,7 @@ services:
       retries: 3
       start_period: 3s
 
-  database-ihm:
-    image: adminer:5.4.1-standalone
-    container_name: adminer
-    ports:
-      - "9090:8080"
-    depends_on:
-      database:
-        condition: service_healthy
-
-  log-aggregator:
+  loki:
     image: grafana/loki:3.6.3
     container_name: loki
     restart: unless-stopped
@@ -35,12 +29,12 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./tools/data/loki:/loki
-      - ./tools/configurations/loki/local-config.yaml:/etc/loki/local-config.yaml
+      - ./tools/configurations/loki/local-config.yml:/etc/loki/local-config.yml
     depends_on:
-      database:
+      postgres:
         condition: service_healthy
 
-  log-agent:
+  alloy:
     image: grafana/alloy:v1.12.1
     container_name: alloy
     restart: unless-stopped
@@ -51,10 +45,24 @@ services:
       - ./tools/configurations/alloy/config.alloy:/etc/alloy/config.alloy
       - ./tmp/logs:/tmp/logs
     depends_on:
-      log-aggregator:
+      loki:
         condition: service_started
 
-  dashboard:
+  prometheus:
+    image: prom/prometheus:v3.9.1
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    command: --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./tools/data/prometheus:/prometheus
+      - ./tools/configurations/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  grafana:
     image: grafana/grafana:11.6.9
     container_name: grafana
     restart: unless-stopped
@@ -70,9 +78,11 @@ services:
       - ./tools/data/grafana/data:/var/lib/grafana
       - ./tools/data/grafana/provisioning:/etc/grafana/provisioning
     depends_on:
-      log-aggregator:
+      loki:
         condition: service_started
-      log-agent:
+      alloy:
+        condition: service_started
+      prometheus:
         condition: service_started
     entrypoint:
       - sh
@@ -91,8 +101,14 @@ services:
           isDefault: false
           version: 1
           editable: false
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          orgId: 1
+          url: http://prometheus:9090
+          basicAuth: false
+          isDefault: false
+          version: 1
+          editable: false
         EOF
         /run.sh
-
-volumes:
-  dev_postgres_data:
