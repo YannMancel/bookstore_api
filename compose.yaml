@@ -62,6 +62,21 @@ services:
       postgres:
         condition: service_healthy
 
+  tempo:
+    image: grafana/tempo:2.9.0
+    container_name: tempo
+    restart: unless-stopped
+    ports:
+      - "3200:3200" # tempo
+      - "9411:9411" # zipkin
+    command: -config.file=/etc/tempo.yaml
+    volumes:
+      - ./tools/data/tempo:/var/tempo
+      - ./tools/configurations/tempo/tempo.yml:/etc/tempo.yaml
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   grafana:
     image: grafana/grafana:11.6.9
     container_name: grafana
@@ -76,7 +91,7 @@ services:
       - GF_FEATURE_TOGGLES_ENABLE=accessControlOnCall
     volumes:
       - ./tools/data/grafana/data:/var/lib/grafana
-      - ./tools/data/grafana/provisioning:/etc/grafana/provisioning
+      - ./tools/configurations/grafana:/etc/grafana/provisioning/datasources
     depends_on:
       loki:
         condition: service_started
@@ -84,31 +99,5 @@ services:
         condition: service_started
       prometheus:
         condition: service_started
-    entrypoint:
-      - sh
-      - -euc
-      - |
-        mkdir -p /etc/grafana/provisioning/datasources
-        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
-        apiVersion: 1
-        datasources:
-        - name: Loki
-          type: loki
-          access: proxy
-          orgId: 1
-          url: http://loki:3100
-          basicAuth: false
-          isDefault: false
-          version: 1
-          editable: false
-        - name: Prometheus
-          type: prometheus
-          access: proxy
-          orgId: 1
-          url: http://prometheus:9090
-          basicAuth: false
-          isDefault: false
-          version: 1
-          editable: false
-        EOF
-        /run.sh
+      tempo:
+        condition: service_started
