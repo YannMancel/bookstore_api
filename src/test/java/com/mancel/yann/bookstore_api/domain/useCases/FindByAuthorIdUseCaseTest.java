@@ -33,27 +33,27 @@ class FindByAuthorIdUseCaseTest extends MockInjectorTest {
             """)
     @Test
     void test1() {
-        var uuid = Fixtures.Author.AUTHOR_UUID;
+        var uuid = Fixtures.Author.UUID;
         BDDMockito.given(mockedAuthorRepository.findById(uuid))
-                .willReturn(Optional.of(Fixtures.Author.getPersistedAuthorEntity()));
+                .willReturn(Optional.of(Fixtures.Author.getPersistedEntity()));
 
-        var author = findByAuthorIdUseCase.execute(uuid);
+        var persistedAuthor = findByAuthorIdUseCase.execute(uuid);
 
         BDDMockito.then(mockedAuthorRepository)
                 .should()
                 .findById(uuid);
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
-        BDDAssertions.then(author)
+        BDDAssertions.then(persistedAuthor)
                 .isNotNull()
                 .extracting(AuthorEntity::id)
-                .isEqualTo(Fixtures.Author.AUTHOR_UUID);
+                .isEqualTo(Fixtures.Author.UUID);
     }
 
     @DisplayName("""
             Given the table is empty
             When the execute method is called with random id
-            Then a NoEntityFoundException is thrown
+            Then an EntityNotFoundException is thrown
             """)
     @Test
     void test2() {

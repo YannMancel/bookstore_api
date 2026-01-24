@@ -29,14 +29,14 @@ class FindAllAuthorsUseCaseTest extends MockInjectorTest {
             """)
     @Test
     void test1() {
-        var authors = findAllAuthorsUseCase.execute();
+        var persistedAuthors = findAllAuthorsUseCase.execute();
 
         BDDMockito.then(mockedAuthorRepository)
                 .should()
                 .findAll();
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
-        BDDAssertions.then(authors)
+        BDDAssertions.then(persistedAuthors)
                 .isNotNull()
                 .isEmpty();
     }
@@ -49,21 +49,21 @@ class FindAllAuthorsUseCaseTest extends MockInjectorTest {
     @Test
     void test2() {
         BDDMockito.given(mockedAuthorRepository.findAll())
-                .willReturn(List.of(Fixtures.Author.getPersistedAuthorEntity()));
+                .willReturn(List.of(Fixtures.Author.getPersistedEntity()));
 
-        var authors = findAllAuthorsUseCase.execute();
+        var persistedAuthors = findAllAuthorsUseCase.execute();
 
         BDDMockito.then(mockedAuthorRepository)
                 .should()
                 .findAll();
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
-        BDDAssertions.then(authors)
+        BDDAssertions.then(persistedAuthors)
                 .isNotNull()
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
                 .extracting(AuthorEntity::id)
-                .isEqualTo(Fixtures.Author.AUTHOR_UUID);
+                .isEqualTo(Fixtures.Author.UUID);
     }
 }

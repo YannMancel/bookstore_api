@@ -5,7 +5,6 @@ import com.mancel.yann.bookstore_api.data.repositories.AuthorPersistRepository;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.exceptions.DomainException;
 import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
-import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
 import org.hibernate.HibernateException;
 import org.hibernate.PropertyValueException;
 import org.junit.jupiter.api.DisplayName;
@@ -30,53 +29,58 @@ class AuthorPersistRepositoryTest {
     @Qualifier("authorPersistRepositoryImpl")
     AuthorPersistRepository authorPersistRepository;
 
-    static Stream<Arguments> invalidRequestGenerator() {
+    static Stream<Arguments> transientEntityWithNullableFieldGenerator() {
         return Stream.of(
                 arguments(
-                        new AuthorCreationRequest("john.doe@gmail.com", null, "Doe"),
+                        new AuthorEntity(null, "John", "Doe"),
+                        "email"),
+                arguments(
+                        new AuthorEntity("john.doe@gmail.com", null, "Doe"),
                         "firstName"),
                 arguments(
-                        new AuthorCreationRequest("john.doe@gmail.com", "John", null),
+                        new AuthorEntity("john.doe@gmail.com", "John", null),
                         "lastName"));
     }
 
-    AuthorCreationRequest convertEntityToRequest(AuthorEntity entity) {
-        return new AuthorCreationRequest(
-                entity.email(),
-                entity.firstName(),
-                entity.lastName());
-    }
+//    static Stream<Arguments> transientEntityWithMoreThanMaxLengthGenerator() {
+//        return Stream.of(
+//                arguments(
+//                        new AuthorEntity(
+//                                RandomString.make(AuthorEntity.EMAIL_LENGTH + 1),
+//                                "John",
+//                                "Doe"),
+//                        "???"));
+//    }
 
     @DisplayName("""
-            Given there is a valid request
-            When the saveFromRequest method is called
+            Given there is a valid transient author
+            When the save method is called
             Then the persistence is success
-            And the entity is returned
+            And the author is returned
             """)
     @Test
     void test1() {
-        var request = Fixtures.Author.getValidAuthorCreationRequest();
+        var request = Fixtures.Author.getValidCreationRequest();
+        var transientEntity = Fixtures.Author.MAPPER.toTransientEntity(request);
 
-        var persistedAuthor = authorPersistRepository.saveFromRequest(request);
+        var persistedAuthor = authorPersistRepository.save(transientEntity);
 
         then(persistedAuthor)
                 .isNotNull()
-                .matches(entity -> convertEntityToRequest(entity).equals(request),
-                        "is equal to the request")
                 .extracting(AuthorEntity::id)
                 .isNotNull();
     }
 
     @DisplayName("""
-            Given there is a invalid request
-            When the saveFromRequest method is called
+            Given there is an invalid transient author
+            When the save method is called
             Then the persistence is fail
             And a PropertyValueException is thrown
             """)
     @ParameterizedTest
-    @MethodSource("invalidRequestGenerator")
-    void test2(AuthorCreationRequest request, String propertyName) {
-        var thrown = catchThrowable(() -> authorPersistRepository.saveFromRequest(request));
+    @MethodSource("transientEntityWithNullableFieldGenerator")
+    void test2(AuthorEntity transientEntity, String propertyName) {
+        var thrown = catchThrowable(() -> authorPersistRepository.save(transientEntity));
 
         then(thrown)
                 .isExactlyInstanceOf(UnknownException.class)
@@ -88,4 +92,26 @@ class AuthorPersistRepositoryTest {
                 .isInstanceOf(HibernateException.class)
                 .isInstanceOf(RuntimeException.class);
     }
+
+//    @DisplayName("""
+//            Given there is an invalid transient author
+//            When the save method is called
+//            Then the persistence is fail
+//            And a PropertyValueException is thrown
+//            """)
+//    @ParameterizedTest
+//    @MethodSource("transientEntityWithMoreThanMaxLengthGenerator")
+//    void test3(AuthorEntity transientEntity, String propertyName) {
+//        var thrown = catchThrowable(() -> authorPersistRepository.save(transientEntity));
+//
+//        then(thrown)
+//                .isExactlyInstanceOf(UnknownException.class)
+//                .isInstanceOf(DomainException.class)
+//                .hasMessageStartingWith("not-null property references a null or transient value")
+//                .hasMessageEndingWith("AuthorModel." + propertyName)
+//                .extracting(Throwable::getCause)
+//                .isExactlyInstanceOf(PropertyValueException.class)
+//                .isInstanceOf(HibernateException.class)
+//                .isInstanceOf(RuntimeException.class);
+//    }
 }

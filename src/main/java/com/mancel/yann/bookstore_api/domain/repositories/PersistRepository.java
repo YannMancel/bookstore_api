@@ -1,9 +1,6 @@
 package com.mancel.yann.bookstore_api.domain.repositories;
 
-import com.mancel.yann.bookstore_api.domain.requests.Request;
+public interface PersistRepository<T> {
 
-
-public interface PersistRepository<R extends Request, T> {
-
-    T saveFromRequest(R request);
+    T save(T transientEntity);
 }

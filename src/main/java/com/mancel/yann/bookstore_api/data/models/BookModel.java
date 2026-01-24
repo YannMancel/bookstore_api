@@ -1,7 +1,6 @@
 package com.mancel.yann.bookstore_api.data.models;
 
 import com.mancel.yann.bookstore_api.data.models.builders.DefaultBookModelBuilder;
-import com.mancel.yann.bookstore_api.domain.entities.BookEntity;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -27,10 +26,6 @@ public class BookModel {
 
     public static Builder getBuilder() {
         return new DefaultBookModelBuilder();
-    }
-
-    public BookEntity getBookEntity() {
-        return new BookEntity(getId(), getTitle(), getAuthor().getAuthorEntity());
     }
 
     public UUID getId() {

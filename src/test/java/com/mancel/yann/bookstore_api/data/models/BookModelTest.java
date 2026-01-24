@@ -26,12 +26,12 @@ class BookModelTest {
             """)
     @Test
     void test1() {
-        var books = entityManager
+        var persistedBooks = entityManager
                 .getEntityManager()
-                .createQuery("select m from BookModel m", BookModel.class)
+                .createQuery("SELECT m FROM BookModel m", BookModel.class)
                 .getResultList();
 
-        then(books)
+        then(persistedBooks)
                 .isNotNull()
                 .isEmpty();
     }
@@ -45,18 +45,18 @@ class BookModelTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void test2() {
-        var books = entityManager
+        var persistedBooks = entityManager
                 .getEntityManager()
-                .createQuery("select m from BookModel m", BookModel.class)
+                .createQuery("SELECT m FROM BookModel m", BookModel.class)
                 .getResultList();
 
-        then(books)
+        then(persistedBooks)
                 .isNotNull()
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
                 .extracting(BookModel::getId)
-                .isEqualTo(Fixtures.Book.BOOK_UUID);
+                .isEqualTo(Fixtures.Book.UUID);
     }
 
     @DisplayName("""
@@ -69,19 +69,19 @@ class BookModelTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void test3() {
-        var books = entityManager
+        var persistedBooks = entityManager
                 .getEntityManager()
-                .createQuery("select m from BookModel m where m.author.id=:authorId", BookModel.class)
-                .setParameter("authorId", Fixtures.Author.AUTHOR_UUID)
+                .createQuery("SELECT m FROM BookModel m WHERE m.author.id=:authorId", BookModel.class)
+                .setParameter("authorId", Fixtures.Author.UUID)
                 .getResultList();
 
-        then(books)
+        then(persistedBooks)
                 .isNotNull()
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
                 .extracting(BookModel::getId)
-                .isEqualTo(Fixtures.Book.BOOK_UUID);
+                .isEqualTo(Fixtures.Book.UUID);
     }
 
     @DisplayName("""
@@ -93,13 +93,13 @@ class BookModelTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void test4() {
-        var books = entityManager
+        var persistedBooks = entityManager
                 .getEntityManager()
-                .createQuery("select m from BookModel m where m.author.id=:authorId", BookModel.class)
+                .createQuery("SELECT m FROM BookModel m WHERE m.author.id=:authorId", BookModel.class)
                 .setParameter("authorId", Fixtures.getRandomUUID())
                 .getResultList();
 
-        then(books)
+        then(persistedBooks)
                 .isNotNull()
                 .isEmpty();
     }
@@ -114,20 +114,20 @@ class BookModelTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void test5() {
-        var randomSubtitle = MessageFormat.format("%{0}%", Fixtures.Book.BOOK_SUBTITLE);
-        var books = entityManager
+        var pattern = MessageFormat.format("%{0}%", Fixtures.Book.TITLE);
+        var persistedBooks = entityManager
                 .getEntityManager()
-                .createQuery("select m from BookModel m where m.title like :title", BookModel.class)
-                .setParameter("title", randomSubtitle)
+                .createQuery("SELECT m FROM BookModel m WHERE m.title LIKE :title", BookModel.class)
+                .setParameter("title", pattern)
                 .getResultList();
 
-        then(books)
+        then(persistedBooks)
                 .isNotNull()
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
                 .extracting(BookModel::getId)
-                .isEqualTo(Fixtures.Book.BOOK_UUID);
+                .isEqualTo(Fixtures.Book.UUID);
     }
 
     @DisplayName("""
@@ -139,14 +139,14 @@ class BookModelTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void test6() {
-        var randomSubtitle = MessageFormat.format("%{0}%", Fixtures.getRandomUUID());
-        var books = entityManager
+        var pattern = MessageFormat.format("%{0}%", Fixtures.getRandomUUID());
+        var persistedBooks = entityManager
                 .getEntityManager()
-                .createQuery("select m from BookModel m where m.title like :title", BookModel.class)
-                .setParameter("title", randomSubtitle)
+                .createQuery("SELECT m FROM BookModel m WHERE m.title LIKE :title", BookModel.class)
+                .setParameter("title", pattern)
                 .getResultList();
 
-        then(books)
+        then(persistedBooks)
                 .isNotNull()
                 .isEmpty();
     }
@@ -158,9 +158,9 @@ class BookModelTest {
             """)
     @Test
     void test7() {
-        var book = entityManager.find(BookModel.class, Fixtures.getRandomUUID());
+        var persistedBook = entityManager.find(BookModel.class, Fixtures.getRandomUUID());
 
-        then(book).isNull();
+        then(persistedBook).isNull();
     }
 
     @DisplayName("""
@@ -171,12 +171,12 @@ class BookModelTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void test8() {
-        var book = entityManager.find(BookModel.class, Fixtures.Book.BOOK_UUID);
+        var persistedBook = entityManager.find(BookModel.class, Fixtures.Book.UUID);
 
-        then(book)
+        then(persistedBook)
                 .isNotNull()
                 .extracting(BookModel::getId)
-                .isEqualTo(Fixtures.Book.BOOK_UUID);
+                .isEqualTo(Fixtures.Book.UUID);
     }
 
     @DisplayName("""
@@ -189,7 +189,7 @@ class BookModelTest {
     @Test
     @Sql({"/scripts/insert_one_author_and_one_book.sql"})
     void test9() {
-        var persistedAuthor = entityManager.find(AuthorModel.class, Fixtures.Author.AUTHOR_UUID);
+        var persistedAuthor = entityManager.find(AuthorModel.class, Fixtures.Author.UUID);
         var transientBook = Fixtures.Book.getTransientBookModel();
         given(persistedAuthor.getId()).isEqualTo(transientBook.getAuthor().getId());
         given(transientBook)

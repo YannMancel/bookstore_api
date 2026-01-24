@@ -3,10 +3,12 @@ package com.mancel.yann.bookstore_api.presentation.controllers;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.exceptions.EntityNotFoundException;
 import com.mancel.yann.bookstore_api.domain.exceptions.ValidationException;
-import com.mancel.yann.bookstore_api.domain.requests.AuthorCreationRequest;
 import com.mancel.yann.bookstore_api.domain.useCases.FindAllUseCase;
 import com.mancel.yann.bookstore_api.domain.useCases.FindByIdUseCase;
 import com.mancel.yann.bookstore_api.domain.useCases.SaveUseCase;
+import com.mancel.yann.bookstore_api.presentation.dto.requests.AuthorCreationRequestDto;
+import com.mancel.yann.bookstore_api.presentation.dto.responses.AuthorResponseDto;
+import com.mancel.yann.bookstore_api.presentation.mappers.Mapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
@@ -20,13 +22,16 @@ import java.util.UUID;
 @RequestMapping(path = "/v1/authors")
 public class AuthorController {
 
+    private final Mapper<AuthorCreationRequestDto, AuthorEntity, AuthorResponseDto> authorMapper;
     private final FindAllUseCase<AuthorEntity> findAllUseCase;
     private final FindByIdUseCase<AuthorEntity> findByIdUseCase;
-    private final SaveUseCase<AuthorCreationRequest, AuthorEntity> saveUseCase;
+    private final SaveUseCase<AuthorEntity> saveUseCase;
 
-    public AuthorController(FindAllUseCase<AuthorEntity> findAllUseCase,
+    public AuthorController(Mapper<AuthorCreationRequestDto, AuthorEntity, AuthorResponseDto> authorMapper,
+                            FindAllUseCase<AuthorEntity> findAllUseCase,
                             FindByIdUseCase<AuthorEntity> findByIdUseCase,
-                            SaveUseCase<AuthorCreationRequest, AuthorEntity> saveUseCase) {
+                            SaveUseCase<AuthorEntity> saveUseCase) {
+        this.authorMapper = authorMapper;
         this.findAllUseCase = findAllUseCase;
         this.findByIdUseCase = findByIdUseCase;
         this.saveUseCase = saveUseCase;
@@ -47,21 +52,30 @@ public class AuthorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AuthorEntity>> findAll() {
-        return ResponseEntity.ok(findAllUseCase.execute());
+    public ResponseEntity<List<AuthorResponseDto>> findAll() {
+        var body = findAllUseCase
+                .execute()
+                .stream()
+                .map(authorMapper::toResponse)
+                .toList();
+        return ResponseEntity.ok(body);
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<AuthorEntity> findById(@PathVariable UUID id) {
-        return ResponseEntity.ok(findByIdUseCase.execute(id));
+    public ResponseEntity<AuthorResponseDto> findById(@PathVariable UUID id) {
+        var entity = findByIdUseCase.execute(id);
+        var body = authorMapper.toResponse(entity);
+        return ResponseEntity.ok(body);
     }
 
     @PostMapping
-    public ResponseEntity<AuthorEntity> saveByRequest(@RequestBody AuthorCreationRequest request) {
-        var author = saveUseCase.execute(request);
-        var location = "/v1/authors/" + author.id();
+    public ResponseEntity<AuthorResponseDto> saveByRequest(@RequestBody AuthorCreationRequestDto request) {
+        var transientEntity = authorMapper.toTransientEntity(request);
+        var entity = saveUseCase.execute(transientEntity);
+        var body = authorMapper.toResponse(entity);
+        var location = "/v1/authors/" + entity.id();
         return ResponseEntity
                 .created(URI.create(location))
-                .body(author);
+                .body(body);
     }
 }

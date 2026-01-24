@@ -14,13 +14,13 @@ public class AuthorModel {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true, length = AuthorEntity.EMAIL_LENGTH)
     private String email;
 
-    @Column(name = "first_name", nullable = false, length = 50)
+    @Column(name = "first_name", nullable = false, length = AuthorEntity.FIRST_NAME_LENGTH)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false, length = 50)
+    @Column(name = "last_name", nullable = false, length = AuthorEntity.LAST_NAME_LENGTH)
     private String lastName;
 
     public AuthorModel() {

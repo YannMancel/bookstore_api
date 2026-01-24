@@ -9,7 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssumptions.given;
+import static org.assertj.core.api.BDDAssumptions.givenCode;
 
 @DataJpaTest
 class AuthorRepositoryTest {
@@ -24,9 +24,9 @@ class AuthorRepositoryTest {
             """)
     @Test
     void test1() {
-        var authors = authorRepository.findAll();
+        var persistedAuthors = authorRepository.findAll();
 
-        then(authors)
+        then(persistedAuthors)
                 .isNotNull()
                 .isEmpty();
     }
@@ -39,15 +39,15 @@ class AuthorRepositoryTest {
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
     void test2() {
-        var authors = authorRepository.findAll();
+        var persistedAuthors = authorRepository.findAll();
 
-        then(authors)
+        then(persistedAuthors)
                 .isNotNull()
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
                 .extracting(AuthorEntity::id)
-                .isEqualTo(Fixtures.Author.AUTHOR_UUID);
+                .isEqualTo(Fixtures.Author.UUID);
     }
 
     @DisplayName("""
@@ -57,9 +57,9 @@ class AuthorRepositoryTest {
             """)
     @Test
     void test3() {
-        var authorOptional = authorRepository.findById(Fixtures.getRandomUUID());
+        var persistedAuthorOptional = authorRepository.findById(Fixtures.getRandomUUID());
 
-        then(authorOptional)
+        then(persistedAuthorOptional)
                 .isNotNull()
                 .isEmpty();
     }
@@ -72,29 +72,29 @@ class AuthorRepositoryTest {
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
     void test4() {
-        var authorOptional = authorRepository.findById(Fixtures.Author.AUTHOR_UUID);
+        var persistedAuthorOptional = authorRepository.findById(Fixtures.Author.UUID);
 
-        then(authorOptional)
+        then(persistedAuthorOptional)
                 .isNotNull()
                 .isNotEmpty()
                 .get()
                 .extracting(AuthorEntity::id)
-                .isEqualTo(Fixtures.Author.AUTHOR_UUID);
+                .isEqualTo(Fixtures.Author.UUID);
     }
 
     @DisplayName("""
-            Given there is a valid request
-            When the saveFromRequest method is called
+            Given there is a valid transient entity
+            When the save method is called
             Then the persistence is success
             And the persisted author is returned
             """)
     @Test
     void test5() {
-        var request = Fixtures.Author.getValidAuthorCreationRequest();
-        given(AuthorEntity.validRequestOrThrow(request))
-                .isEqualTo(request);
+        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
+        var transientEntity = Fixtures.Author.MAPPER.toTransientEntity(authorCreationRequest);
+        givenCode(transientEntity::validOrThrow).doesNotThrowAnyException();
 
-        var persistedAuthor = authorRepository.saveFromRequest(request);
+        var persistedAuthor = authorRepository.save(transientEntity);
 
         then(persistedAuthor)
                 .extracting(AuthorEntity::id)
