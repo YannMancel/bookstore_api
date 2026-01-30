@@ -1,6 +1,7 @@
 package com.mancel.yann.bookstore_api.domain.exceptions;
 
-public abstract sealed class DomainException extends RuntimeException permits EntityNotFoundException, UnknownException, ValidationException {
+public abstract sealed class DomainException extends RuntimeException
+        permits EntityNotFoundException, TransactionException, UnknownException, ValidationException {
 
     public DomainException(String message) {
         super(message);

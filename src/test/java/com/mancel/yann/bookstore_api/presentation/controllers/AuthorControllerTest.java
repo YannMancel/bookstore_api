@@ -5,6 +5,7 @@ import com.mancel.yann.bookstore_api.Fixtures;
 import com.mancel.yann.bookstore_api.MvcResultTools;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.exceptions.EntityNotFoundException;
+import com.mancel.yann.bookstore_api.domain.exceptions.TransactionException;
 import com.mancel.yann.bookstore_api.domain.exceptions.ValidationException;
 import com.mancel.yann.bookstore_api.domain.useCases.FindAllUseCase;
 import com.mancel.yann.bookstore_api.domain.useCases.FindByIdUseCase;
@@ -206,6 +207,42 @@ class AuthorControllerTest {
         var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
         var transientAuthor = Fixtures.Author.MAPPER.toTransientEntity(authorCreationRequest);
         var exception = new ValidationException("foo");
+        given(mapper.toTransientEntity(authorCreationRequest))
+                .willReturn(transientAuthor);
+        given(saveUseCase.execute(transientAuthor))
+                .willThrow(exception);
+
+        var request = post("/v1/authors")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(authorCreationRequest));
+        var result = mockMvc.perform(request)
+                .andDo(print())
+                .andReturn();
+
+        BDDMockito.then(saveUseCase)
+                .should()
+                .execute(transientAuthor);
+        BDDAssertions.then(result)
+                .isNotNull()
+                .matches(mvcResult -> MvcResultTools.isMethodName(mvcResult, "saveByRequest"),
+                        "is correct method")
+                .matches(mvcResult -> MvcResultTools.isStatus(mvcResult, HttpStatus.BAD_REQUEST),
+                        "is Bad Request")
+                .matches(mvcResult -> MvcResultTools.hasException(mvcResult, exception),
+                        "has correct exception");
+    }
+
+    @DisplayName("""
+            Given this author creation request is mapped in transient author
+            And the save use case throws a TransactionException
+            When the saveByRequest method is called
+            Then the response is a 400 Bad Request
+            """)
+    @Test
+    void test6() throws Exception {
+        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
+        var transientAuthor = Fixtures.Author.MAPPER.toTransientEntity(authorCreationRequest);
+        var exception = new TransactionException("foo", new Exception());
         given(mapper.toTransientEntity(authorCreationRequest))
                 .willReturn(transientAuthor);
         given(saveUseCase.execute(transientAuthor))

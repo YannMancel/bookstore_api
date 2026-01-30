@@ -24,13 +24,13 @@ public class AuthorPersistRepositoryImpl implements AuthorPersistRepository {
     @Transactional
     public AuthorEntity save(AuthorEntity transientEntity) {
         try {
-            var transientAuthor = AuthorModel.getBuilder()
+            var transientAuthorModel = AuthorModel.getBuilder()
                     .setEmail(transientEntity.email())
                     .setFirstName(transientEntity.firstName())
                     .setLastName(transientEntity.lastName())
                     .build();
-            entityManager.persist(transientAuthor);
-            return transientAuthor.getAuthorEntity();
+            entityManager.persist(transientAuthorModel);
+            return transientAuthorModel.getAuthorEntity();
         } catch (Exception exception) {
             throw new UnknownException(exception.getMessage(), exception);
         }

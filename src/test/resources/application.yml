@@ -1,9 +1,20 @@
 spring:
+  datasource:
+    url: jdbc:h2:mem:dev-database;DB_CLOSE_ON_EXIT=FALSE
+    username: yann
+    password: api
   jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: false
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
         highlight_sql: true
   sql:
     init:
-      mode: never
+      mode: embedded
+  flyway:
+    enabled: false

@@ -2,6 +2,7 @@ package com.mancel.yann.bookstore_api.presentation.controllers;
 
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.exceptions.EntityNotFoundException;
+import com.mancel.yann.bookstore_api.domain.exceptions.TransactionException;
 import com.mancel.yann.bookstore_api.domain.exceptions.ValidationException;
 import com.mancel.yann.bookstore_api.domain.useCases.FindAllUseCase;
 import com.mancel.yann.bookstore_api.domain.useCases.FindByIdUseCase;
@@ -48,6 +49,13 @@ public class AuthorController {
     public ErrorResponse resolveValidationException(ValidationException exception) {
         return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
                 .type(URI.create("/errors/validation-exception"))
+                .build();
+    }
+
+    @ExceptionHandler(TransactionException.class)
+    public ErrorResponse resolveValidationException(TransactionException exception) {
+        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
+                .type(URI.create("/errors/transaction-exception"))
                 .build();
     }
 
