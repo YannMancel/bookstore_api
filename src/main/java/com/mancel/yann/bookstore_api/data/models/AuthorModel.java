@@ -30,10 +30,6 @@ public class AuthorModel {
         return new DefaultAuthorModelBuilder();
     }
 
-    public AuthorEntity getAuthorEntity() {
-        return new AuthorEntity(getId(), getEmail(), getFirstName(), getLastName());
-    }
-
     public UUID getId() {
         return id;
     }

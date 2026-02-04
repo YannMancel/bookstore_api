@@ -1,5 +1,6 @@
 package com.mancel.yann.bookstore_api.data.repositories.impl;
 
+import com.mancel.yann.bookstore_api.data.mappers.DataMapper;
 import com.mancel.yann.bookstore_api.data.models.AuthorModel;
 import com.mancel.yann.bookstore_api.data.repositories.AuthorPersistRepository;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
@@ -15,22 +16,22 @@ public class AuthorPersistRepositoryImpl implements AuthorPersistRepository {
 
     private final EntityManager entityManager;
 
+    private final DataMapper<AuthorEntity, AuthorModel> authorDataMapper;
+
     @Autowired
-    public AuthorPersistRepositoryImpl(JpaContext context) {
+    public AuthorPersistRepositoryImpl(JpaContext context,
+                                       DataMapper<AuthorEntity, AuthorModel> authorDataMapper) {
         this.entityManager = context.getEntityManagerByManagedType(AuthorModel.class);
+        this.authorDataMapper = authorDataMapper;
     }
 
     @Override
     @Transactional
     public AuthorEntity save(AuthorEntity transientEntity) {
         try {
-            var transientAuthorModel = AuthorModel.getBuilder()
-                    .setEmail(transientEntity.email())
-                    .setFirstName(transientEntity.firstName())
-                    .setLastName(transientEntity.lastName())
-                    .build();
+            var transientAuthorModel = authorDataMapper.toTransientModel(transientEntity);
             entityManager.persist(transientAuthorModel);
-            return transientAuthorModel.getAuthorEntity();
+            return authorDataMapper.toPersistedEntity(transientAuthorModel);
         } catch (Exception exception) {
             throw new UnknownException(exception.getMessage(), exception);
         }

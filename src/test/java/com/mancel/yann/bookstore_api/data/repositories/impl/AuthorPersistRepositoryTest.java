@@ -1,15 +1,14 @@
 package com.mancel.yann.bookstore_api.data.repositories.impl;
 
 import com.mancel.yann.bookstore_api.Fixtures;
+import com.mancel.yann.bookstore_api.configuration.ApplicationConfiguration;
 import com.mancel.yann.bookstore_api.data.repositories.AuthorPersistRepository;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
-import com.mancel.yann.bookstore_api.domain.exceptions.DomainException;
-import com.mancel.yann.bookstore_api.domain.exceptions.UnknownException;
 import net.bytebuddy.utility.RandomString;
 import org.h2.jdbc.JdbcSQLDataException;
-import org.hibernate.HibernateException;
+import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
 import org.hibernate.JDBCException;
-import org.hibernate.PropertyValueException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.DataException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,8 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 
 import java.sql.SQLDataException;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.stream.Stream;
 
@@ -30,6 +31,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @DataJpaTest
+@Import(ApplicationConfiguration.class)
 class AuthorPersistRepositoryTest {
 
     @Autowired
@@ -43,13 +45,13 @@ class AuthorPersistRepositoryTest {
         return Stream.of(
                 arguments(
                         new AuthorEntity(null, "John", "Doe"),
-                        "email"),
+                        "EMAIL"),
                 arguments(
                         new AuthorEntity("john.doe@gmail.com", null, "Doe"),
-                        "firstName"),
+                        "FIRST_NAME"),
                 arguments(
                         new AuthorEntity("john.doe@gmail.com", "John", null),
-                        "lastName"));
+                        "LAST_NAME"));
     }
 
     static Stream<Arguments> transientEntityWithMoreThanMaxLengthGenerator() {
@@ -102,23 +104,24 @@ class AuthorPersistRepositoryTest {
     @DisplayName("""
             Given there is an invalid transient author
             When the save method is called
-            Then the persistence is fail
-            And a PropertyValueException is thrown
+            Then the transaction is fail
+            And a ConstraintViolationException is thrown
             """)
     @ParameterizedTest
     @MethodSource("transientEntityWithNullableFieldGenerator")
-    void test2(AuthorEntity transientEntity, String propertyName) {
-        var thrown = catchThrowable(() -> authorPersistRepository.save(transientEntity));
+    void test2(AuthorEntity transientEntity, String label) {
+        authorPersistRepository.save(transientEntity);
+        var thrown = catchThrowable(() -> testEntityManager.flush());
 
         then(thrown)
-                .isExactlyInstanceOf(UnknownException.class)
-                .isInstanceOf(DomainException.class)
-                .hasMessageStartingWith("not-null property references a null or transient value")
-                .hasMessageEndingWith("AuthorModel." + propertyName)
+                .isExactlyInstanceOf(ConstraintViolationException.class)
+                .isInstanceOf(JDBCException.class)
+                .hasMessageStartingWith("could not execute statement")
+                .hasMessageContaining(label)
                 .extracting(Throwable::getCause)
-                .isExactlyInstanceOf(PropertyValueException.class)
-                .isInstanceOf(HibernateException.class)
-                .isInstanceOf(RuntimeException.class);
+                .isExactlyInstanceOf(JdbcSQLIntegrityConstraintViolationException.class)
+                .isInstanceOf(SQLException.class)
+                .isInstanceOf(Exception.class);
     }
 
     @DisplayName("""
@@ -136,9 +139,8 @@ class AuthorPersistRepositoryTest {
         then(thrown)
                 .isExactlyInstanceOf(DataException.class)
                 .isInstanceOf(JDBCException.class)
-                .hasMessageStartingWith(
-                        MessageFormat.format(
-                        "could not execute statement [Valeur trop longue pour la colonne \"{0}\"", label))
+                .hasMessageStartingWith("could not execute statement")
+                .hasMessageContaining(label)
                 .extracting(Throwable::getCause)
                 .isExactlyInstanceOf(JdbcSQLDataException.class)
                 .isInstanceOf(SQLDataException.class)

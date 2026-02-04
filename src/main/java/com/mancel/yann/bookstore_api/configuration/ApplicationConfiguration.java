@@ -1,6 +1,9 @@
 package com.mancel.yann.bookstore_api.configuration;
 
 import com.mancel.yann.bookstore_api.data.delegates.JpaTransactionDelegate;
+import com.mancel.yann.bookstore_api.data.mappers.AuthorDataMapper;
+import com.mancel.yann.bookstore_api.data.mappers.DataMapper;
+import com.mancel.yann.bookstore_api.data.models.AuthorModel;
 import com.mancel.yann.bookstore_api.domain.delegates.TransactionDelegate;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.repositories.AuthorRepository;
@@ -20,12 +23,16 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Configuration
 @EnableJpaRepositories(basePackages = "com.mancel.yann.bookstore_api.data.repositories")
 @EntityScan("com.mancel.yann.bookstore_api.data.models")
-//@EnableTransactionManagement
 public class ApplicationConfiguration {
 
     @Bean
     public TransactionDelegate transactionDelegate() {
         return new JpaTransactionDelegate();
+    }
+
+    @Bean
+    public DataMapper<AuthorEntity, AuthorModel> authorDataMapper() {
+        return new AuthorDataMapper();
     }
 
     @Bean
