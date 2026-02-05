@@ -1,7 +1,7 @@
 package com.mancel.yann.bookstore_api.data.repositories.impl;
 
 import com.mancel.yann.bookstore_api.Fixtures;
-import com.mancel.yann.bookstore_api.configuration.ApplicationConfiguration;
+import com.mancel.yann.bookstore_api.configuration.DataConfiguration;
 import com.mancel.yann.bookstore_api.data.repositories.AuthorPersistRepository;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import net.bytebuddy.utility.RandomString;
@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.sql.SQLDataException;
 import java.sql.SQLException;
@@ -31,7 +31,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @DataJpaTest
-@Import(ApplicationConfiguration.class)
+@ContextConfiguration(classes = DataConfiguration.class)
 class AuthorPersistRepositoryTest {
 
     @Autowired

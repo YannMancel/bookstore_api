@@ -1,20 +1,20 @@
 package com.mancel.yann.bookstore_api.domain.repositories;
 
 import com.mancel.yann.bookstore_api.Fixtures;
-import com.mancel.yann.bookstore_api.configuration.ApplicationConfiguration;
+import com.mancel.yann.bookstore_api.configuration.DataConfiguration;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssumptions.givenCode;
 
 @DataJpaTest
-@Import(ApplicationConfiguration.class)
+@ContextConfiguration(classes = DataConfiguration.class)
 class AuthorRepositoryTest {
 
     @Autowired
