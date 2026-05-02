@@ -4,7 +4,7 @@ import com.mancel.yann.bookstore_api.Fixtures;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.repositories.AuthorRepository;
 import com.mancel.yann.bookstore_api.domain.useCases.impl.FindAllAuthorsUseCase;
-import com.mancel.yann.bookstore_api.mocks.MockInjectorTest;
+import com.mancel.yann.bookstore_api.mocks.MockInjector;
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import org.mockito.Mock;
 
 import java.util.List;
 
-class FindAllAuthorsUseCaseTest extends MockInjectorTest {
+class FindAllAuthorsUseCaseTest extends MockInjector {
 
     @Mock
     AuthorRepository mockedAuthorRepository;
@@ -29,14 +29,14 @@ class FindAllAuthorsUseCaseTest extends MockInjectorTest {
             """)
     @Test
     void test1() {
-        var persistedAuthors = findAllAuthorsUseCase.execute();
+        var persistedEntities = findAllAuthorsUseCase.execute();
 
         BDDMockito.then(mockedAuthorRepository)
                 .should()
                 .findAll();
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
-        BDDAssertions.then(persistedAuthors)
+        BDDAssertions.then(persistedEntities)
                 .isNotNull()
                 .isEmpty();
     }
@@ -51,19 +51,19 @@ class FindAllAuthorsUseCaseTest extends MockInjectorTest {
         BDDMockito.given(mockedAuthorRepository.findAll())
                 .willReturn(List.of(Fixtures.Author.getPersistedEntity()));
 
-        var persistedAuthors = findAllAuthorsUseCase.execute();
+        var persistedEntities = findAllAuthorsUseCase.execute();
 
         BDDMockito.then(mockedAuthorRepository)
                 .should()
                 .findAll();
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
-        BDDAssertions.then(persistedAuthors)
+        BDDAssertions.then(persistedEntities)
                 .isNotNull()
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                .extracting(AuthorEntity::id)
-                .isEqualTo(Fixtures.Author.UUID);
+                    .extracting(AuthorEntity::id)
+                        .isEqualTo(Fixtures.Author.UUID);
     }
 }

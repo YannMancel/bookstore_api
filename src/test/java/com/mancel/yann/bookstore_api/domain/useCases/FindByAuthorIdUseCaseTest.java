@@ -5,7 +5,7 @@ import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.exceptions.EntityNotFoundException;
 import com.mancel.yann.bookstore_api.domain.repositories.AuthorRepository;
 import com.mancel.yann.bookstore_api.domain.useCases.impl.FindByAuthorIdUseCase;
-import com.mancel.yann.bookstore_api.mocks.MockInjectorTest;
+import com.mancel.yann.bookstore_api.mocks.MockInjector;
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.BDDAssertions.catchThrowable;
 
-class FindByAuthorIdUseCaseTest extends MockInjectorTest {
+class FindByAuthorIdUseCaseTest extends MockInjector {
 
     @Mock
     AuthorRepository mockedAuthorRepository;
@@ -37,17 +37,17 @@ class FindByAuthorIdUseCaseTest extends MockInjectorTest {
         BDDMockito.given(mockedAuthorRepository.findById(uuid))
                 .willReturn(Optional.of(Fixtures.Author.getPersistedEntity()));
 
-        var persistedAuthor = findByAuthorIdUseCase.execute(uuid);
+        var persistedEntity = findByAuthorIdUseCase.execute(uuid);
 
         BDDMockito.then(mockedAuthorRepository)
                 .should()
                 .findById(uuid);
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
-        BDDAssertions.then(persistedAuthor)
+        BDDAssertions.then(persistedEntity)
                 .isNotNull()
                 .extracting(AuthorEntity::id)
-                .isEqualTo(Fixtures.Author.UUID);
+                    .isEqualTo(Fixtures.Author.UUID);
     }
 
     @DisplayName("""

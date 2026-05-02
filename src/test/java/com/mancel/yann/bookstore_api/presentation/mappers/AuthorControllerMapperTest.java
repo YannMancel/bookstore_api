@@ -2,7 +2,6 @@ package com.mancel.yann.bookstore_api.presentation.mappers;
 
 import com.mancel.yann.bookstore_api.Fixtures;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
-import com.mancel.yann.bookstore_api.presentation.dto.requests.AuthorCreationRequestDto;
 import com.mancel.yann.bookstore_api.presentation.dto.responses.AuthorResponseDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,37 +9,35 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssumptions.given;
 
-class AuthorMapperTest {
-
-    private final Mapper<AuthorCreationRequestDto, AuthorEntity, AuthorResponseDto> mapper = new AuthorMapper();
+class AuthorControllerMapperTest {
 
     @DisplayName("Should convert persisted author to author response with success")
     @Test
     void test1() {
-        var persistedAuthor = Fixtures.Author.getPersistedEntity();
-        given(persistedAuthor)
+        var persistedEntity = Fixtures.Author.getPersistedEntity();
+        given(persistedEntity)
                 .isNotNull()
                 .extracting(AuthorEntity::id)
-                .isNotNull();
+                    .isNotNull();
 
-        var authorResponse = mapper.toResponse(persistedAuthor);
+        var response = Fixtures.Author.CONTROLLER_MAPPER.toResponse(persistedEntity);
 
-        then(authorResponse)
+        then(response)
                 .isNotNull()
                 .extracting(AuthorResponseDto::id)
-                .isNotNull();
+                    .isNotNull();
     }
 
     @DisplayName("Should convert author creation response to transient author with success")
     @Test
     void test2() {
-        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
+        var request = Fixtures.Author.getValidCreationRequest();
 
-        var transientAuthorEntity = mapper.toTransientEntity(authorCreationRequest);
+        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(request);
 
-        then(transientAuthorEntity)
+        then(transientEntity)
                 .isNotNull()
                 .extracting(AuthorEntity::id)
-                .isNull();
+                    .isNull();
     }
 }

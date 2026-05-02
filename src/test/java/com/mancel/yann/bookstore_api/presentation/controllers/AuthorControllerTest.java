@@ -12,7 +12,7 @@ import com.mancel.yann.bookstore_api.domain.useCases.FindByIdUseCase;
 import com.mancel.yann.bookstore_api.domain.useCases.SaveUseCase;
 import com.mancel.yann.bookstore_api.presentation.dto.requests.AuthorCreationRequestDto;
 import com.mancel.yann.bookstore_api.presentation.dto.responses.AuthorResponseDto;
-import com.mancel.yann.bookstore_api.presentation.mappers.Mapper;
+import com.mancel.yann.bookstore_api.presentation.mappers.ControllerMapper;
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class AuthorControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private Mapper<AuthorCreationRequestDto, AuthorEntity, AuthorResponseDto> mapper;
+    private ControllerMapper<AuthorCreationRequestDto, AuthorEntity, AuthorResponseDto> controllerMapper;
 
     @MockitoBean
     private FindAllUseCase<AuthorEntity> findAllUseCase;
@@ -60,16 +60,16 @@ class AuthorControllerTest {
             """)
     @Test
     void test1() throws Exception {
-        var persistedAuthor = Fixtures.Author.getPersistedEntity();
-        var persistedAuthors = List.of(persistedAuthor);
-        var authorResponses = persistedAuthors
+        var persistedEntity = Fixtures.Author.getPersistedEntity();
+        var persistedEntities = List.of(persistedEntity);
+        var responses = persistedEntities
                 .stream()
-                .map(Fixtures.Author.MAPPER::toResponse)
+                .map(Fixtures.Author.CONTROLLER_MAPPER::toResponse)
                 .toList();
         given(findAllUseCase.execute())
-                .willReturn(persistedAuthors);
-        given(mapper.toResponse(persistedAuthor))
-                .willReturn(Fixtures.Author.MAPPER.toResponse(persistedAuthor));
+                .willReturn(persistedEntities);
+        given(controllerMapper.toResponse(persistedEntity))
+                .willReturn(Fixtures.Author.CONTROLLER_MAPPER.toResponse(persistedEntity));
 
         var request = get("/v1/authors")
                 .contentType(MediaType.APPLICATION_JSON);
@@ -86,7 +86,7 @@ class AuthorControllerTest {
                         "is correct method")
                 .matches(mvcResult -> MvcResultTools.isStatus(mvcResult, HttpStatus.OK),
                         "is Ok")
-                .matches(mvcResult -> MvcResultTools.hasContent(mvcResult, objectMapper, authorResponses),
+                .matches(mvcResult -> MvcResultTools.hasContent(mvcResult, objectMapper, responses),
                         "has correct author responses");
     }
 
@@ -99,12 +99,12 @@ class AuthorControllerTest {
     @Test
     void test2() throws Exception {
         var uuid = Fixtures.Author.UUID;
-        var persistedAuthor = Fixtures.Author.getPersistedEntity();
-        var authorResponse = Fixtures.Author.MAPPER.toResponse(persistedAuthor);
+        var persistedEntity = Fixtures.Author.getPersistedEntity();
+        var response = Fixtures.Author.CONTROLLER_MAPPER.toResponse(persistedEntity);
         given(findByIdUseCase.execute(uuid))
-                .willReturn(persistedAuthor);
-        given(mapper.toResponse(persistedAuthor))
-                .willReturn(authorResponse);
+                .willReturn(persistedEntity);
+        given(controllerMapper.toResponse(persistedEntity))
+                .willReturn(response);
 
         var request = get("/v1/authors/{id}", uuid)
                 .contentType(MediaType.APPLICATION_JSON);
@@ -121,7 +121,7 @@ class AuthorControllerTest {
                         "is correct method")
                 .matches(mvcResult -> MvcResultTools.isStatus(mvcResult, HttpStatus.OK),
                         "is Ok")
-                .matches(mvcResult -> MvcResultTools.hasContent(mvcResult, objectMapper, authorResponse),
+                .matches(mvcResult -> MvcResultTools.hasContent(mvcResult, objectMapper, response),
                         "has correct author response");
     }
 
@@ -165,34 +165,34 @@ class AuthorControllerTest {
             """)
     @Test
     void test4() throws Exception {
-        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
-        var transientAuthor = Fixtures.Author.MAPPER.toTransientEntity(authorCreationRequest);
-        var persistedAuthor = Fixtures.Author.getPersistedEntity();
-        var authorResponse = Fixtures.Author.MAPPER.toResponse(persistedAuthor);
-        given(mapper.toTransientEntity(authorCreationRequest))
-                .willReturn(transientAuthor);
-        given(saveUseCase.execute(transientAuthor))
-                .willReturn(persistedAuthor);
-        given(mapper.toResponse(persistedAuthor))
-                .willReturn(authorResponse);
+        var creationRequest = Fixtures.Author.getValidCreationRequest();
+        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(creationRequest);
+        var persistedEntity = Fixtures.Author.getPersistedEntity();
+        var response = Fixtures.Author.CONTROLLER_MAPPER.toResponse(persistedEntity);
+        given(controllerMapper.toTransientEntity(creationRequest))
+                .willReturn(transientEntity);
+        given(saveUseCase.execute(transientEntity))
+                .willReturn(persistedEntity);
+        given(controllerMapper.toResponse(persistedEntity))
+                .willReturn(response);
 
         var request = post("/v1/authors")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(authorCreationRequest));
+                .content(objectMapper.writeValueAsString(creationRequest));
         var result = mockMvc.perform(request)
                 .andDo(print())
                 .andReturn();
 
         BDDMockito.then(saveUseCase)
                 .should()
-                .execute(transientAuthor);
+                .execute(transientEntity);
         BDDAssertions.then(result)
                 .isNotNull()
                 .matches(mvcResult -> MvcResultTools.isMethodName(mvcResult, "saveByRequest"),
                         "is correct method")
                 .matches(mvcResult -> MvcResultTools.isStatus(mvcResult, HttpStatus.CREATED),
                         "is CREATED")
-                .matches(mvcResult -> MvcResultTools.hasContent(mvcResult, objectMapper, authorResponse),
+                .matches(mvcResult -> MvcResultTools.hasContent(mvcResult, objectMapper, response),
                         "has correct author response");
     }
 
@@ -204,24 +204,24 @@ class AuthorControllerTest {
             """)
     @Test
     void test5() throws Exception {
-        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
-        var transientAuthor = Fixtures.Author.MAPPER.toTransientEntity(authorCreationRequest);
+        var creationRequest = Fixtures.Author.getValidCreationRequest();
+        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(creationRequest);
         var exception = new ValidationException("foo");
-        given(mapper.toTransientEntity(authorCreationRequest))
-                .willReturn(transientAuthor);
-        given(saveUseCase.execute(transientAuthor))
+        given(controllerMapper.toTransientEntity(creationRequest))
+                .willReturn(transientEntity);
+        given(saveUseCase.execute(transientEntity))
                 .willThrow(exception);
 
         var request = post("/v1/authors")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(authorCreationRequest));
+                .content(objectMapper.writeValueAsString(creationRequest));
         var result = mockMvc.perform(request)
                 .andDo(print())
                 .andReturn();
 
         BDDMockito.then(saveUseCase)
                 .should()
-                .execute(transientAuthor);
+                .execute(transientEntity);
         BDDAssertions.then(result)
                 .isNotNull()
                 .matches(mvcResult -> MvcResultTools.isMethodName(mvcResult, "saveByRequest"),
@@ -240,24 +240,24 @@ class AuthorControllerTest {
             """)
     @Test
     void test6() throws Exception {
-        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
-        var transientAuthor = Fixtures.Author.MAPPER.toTransientEntity(authorCreationRequest);
+        var creationRequest = Fixtures.Author.getValidCreationRequest();
+        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(creationRequest);
         var exception = new TransactionException("foo", new Exception());
-        given(mapper.toTransientEntity(authorCreationRequest))
-                .willReturn(transientAuthor);
-        given(saveUseCase.execute(transientAuthor))
+        given(controllerMapper.toTransientEntity(creationRequest))
+                .willReturn(transientEntity);
+        given(saveUseCase.execute(transientEntity))
                 .willThrow(exception);
 
         var request = post("/v1/authors")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(authorCreationRequest));
+                .content(objectMapper.writeValueAsString(creationRequest));
         var result = mockMvc.perform(request)
                 .andDo(print())
                 .andReturn();
 
         BDDMockito.then(saveUseCase)
                 .should()
-                .execute(transientAuthor);
+                .execute(transientEntity);
         BDDAssertions.then(result)
                 .isNotNull()
                 .matches(mvcResult -> MvcResultTools.isMethodName(mvcResult, "saveByRequest"),

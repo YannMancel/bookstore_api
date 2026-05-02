@@ -3,15 +3,17 @@ package com.mancel.yann.bookstore_api.presentation.mappers;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.presentation.dto.requests.AuthorCreationRequestDto;
 import com.mancel.yann.bookstore_api.presentation.dto.responses.AuthorResponseDto;
+import org.springframework.util.Assert;
 
-public class AuthorMapper implements Mapper<AuthorCreationRequestDto, AuthorEntity, AuthorResponseDto> {
+public class AuthorControllerMapper implements ControllerMapper<AuthorCreationRequestDto, AuthorEntity, AuthorResponseDto> {
     @Override
-    public AuthorResponseDto toResponse(AuthorEntity entity) {
+    public AuthorResponseDto toResponse(AuthorEntity persistedEntity) {
+        Assert.notNull(persistedEntity.id(), "Persisted author's id must be not null.");
         return new AuthorResponseDto(
-                entity.id(),
-                entity.email(),
-                entity.firstName(),
-                entity.lastName());
+                persistedEntity.id(),
+                persistedEntity.email(),
+                persistedEntity.firstName(),
+                persistedEntity.lastName());
     }
 
     @Override

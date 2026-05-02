@@ -10,45 +10,41 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssumptions.given;
 
 class AuthorDataMapperTest {
-    private final DataMapper<AuthorEntity, AuthorModel> mapper = new AuthorDataMapper();
 
     @DisplayName("Should convert persisted author model to persisted author entity with success")
     @Test
     void test1() {
-        var transientAuthorModel = Fixtures.Author.getTransientModel();
-        var persistedAuthorModel = AuthorModel.getBuilder()
+        var transientModel = Fixtures.Author.getTransientModel();
+        var persistedModel = AuthorModel.getBuilder()
                 .setId(Fixtures.Author.UUID)
-                .setEmail(transientAuthorModel.getEmail())
-                .setFirstName(transientAuthorModel.getFirstName())
-                .setLastName(transientAuthorModel.getLastName())
+                .setEmail(transientModel.getEmail())
+                .setFirstName(transientModel.getFirstName())
+                .setLastName(transientModel.getLastName())
                 .build();
-        given(persistedAuthorModel)
+        given(persistedModel)
                 .isNotNull()
                 .extracting(AuthorModel::getId)
-                .isNotNull();
+                    .isNotNull();
 
-        var persistedAuthorEntity = mapper.toPersistedEntity(persistedAuthorModel);
+        var persistedEntity = Fixtures.Author.DATA_MAPPER.toPersistedEntity(persistedModel);
 
-        then(persistedAuthorEntity)
+        then(persistedEntity)
                 .isNotNull()
                 .extracting(AuthorEntity::id)
-                .isNotNull();
+                    .isNotNull();
     }
 
     @DisplayName("Should convert transient author entity to transient author model with success")
     @Test
     void test2() {
-        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
-        var transientAuthorEntity = new AuthorEntity(
-                authorCreationRequest.email(),
-                authorCreationRequest.firstName(),
-                authorCreationRequest.lastName());
+        var request = Fixtures.Author.getValidCreationRequest();
+        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(request);
 
-        var transientAuthorModel = mapper.toTransientModel(transientAuthorEntity);
+        var transientModel = Fixtures.Author.DATA_MAPPER.toTransientModel(transientEntity);
 
-        then(transientAuthorModel)
+        then(transientModel)
                 .isNotNull()
                 .extracting(AuthorModel::getId)
-                .isNull();
+                    .isNull();
     }
 }

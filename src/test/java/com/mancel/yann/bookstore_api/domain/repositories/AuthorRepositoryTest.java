@@ -27,9 +27,9 @@ class AuthorRepositoryTest {
             """)
     @Test
     void test1() {
-        var persistedAuthors = authorRepository.findAll();
+        var persistedEntities = authorRepository.findAll();
 
-        then(persistedAuthors)
+        then(persistedEntities)
                 .isNotNull()
                 .isEmpty();
     }
@@ -42,15 +42,15 @@ class AuthorRepositoryTest {
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
     void test2() {
-        var persistedAuthors = authorRepository.findAll();
+        var persistedEntities = authorRepository.findAll();
 
-        then(persistedAuthors)
+        then(persistedEntities)
                 .isNotNull()
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                .extracting(AuthorEntity::id)
-                .isEqualTo(Fixtures.Author.UUID);
+                    .extracting(AuthorEntity::id)
+                        .isEqualTo(Fixtures.Author.UUID);
     }
 
     @DisplayName("""
@@ -60,9 +60,9 @@ class AuthorRepositoryTest {
             """)
     @Test
     void test3() {
-        var persistedAuthorOptional = authorRepository.findById(Fixtures.getRandomUUID());
+        var persistedEntityOptional = authorRepository.findById(Fixtures.getRandomUUID());
 
-        then(persistedAuthorOptional)
+        then(persistedEntityOptional)
                 .isNotNull()
                 .isEmpty();
     }
@@ -75,14 +75,14 @@ class AuthorRepositoryTest {
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
     void test4() {
-        var persistedAuthorOptional = authorRepository.findById(Fixtures.Author.UUID);
+        var persistedEntityOptional = authorRepository.findById(Fixtures.Author.UUID);
 
-        then(persistedAuthorOptional)
+        then(persistedEntityOptional)
                 .isNotNull()
                 .isNotEmpty()
                 .get()
                 .extracting(AuthorEntity::id)
-                .isEqualTo(Fixtures.Author.UUID);
+                    .isEqualTo(Fixtures.Author.UUID);
     }
 
     @DisplayName("""
@@ -93,14 +93,14 @@ class AuthorRepositoryTest {
             """)
     @Test
     void test5() {
-        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
-        var transientEntity = Fixtures.Author.MAPPER.toTransientEntity(authorCreationRequest);
+        var request = Fixtures.Author.getValidCreationRequest();
+        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(request);
         givenCode(transientEntity::validOrThrow).doesNotThrowAnyException();
 
-        var persistedAuthor = authorRepository.save(transientEntity);
+        var persistedEntity = authorRepository.save(transientEntity);
 
-        then(persistedAuthor)
+        then(persistedEntity)
                 .extracting(AuthorEntity::id)
-                .isNotNull();
+                    .isNotNull();
     }
 }

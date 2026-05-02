@@ -1,11 +1,13 @@
 package com.mancel.yann.bookstore_api;
 
+import com.mancel.yann.bookstore_api.data.mappers.AuthorDataMapper;
+import com.mancel.yann.bookstore_api.data.mappers.DataMapper;
 import com.mancel.yann.bookstore_api.data.models.AuthorModel;
 import com.mancel.yann.bookstore_api.data.models.BookModel;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.presentation.dto.requests.AuthorCreationRequestDto;
 import com.mancel.yann.bookstore_api.presentation.dto.requests.BookCreationRequestDto;
-import com.mancel.yann.bookstore_api.presentation.mappers.AuthorMapper;
+import com.mancel.yann.bookstore_api.presentation.mappers.AuthorControllerMapper;
 
 public abstract class Fixtures {
 
@@ -15,7 +17,10 @@ public abstract class Fixtures {
 
     public static class Author {
         public static final java.util.UUID UUID = java.util.UUID.fromString("64f07a63-1c1c-415e-b2c7-6a54860e6083");
-        public static final AuthorMapper MAPPER = new AuthorMapper();
+
+        public static final DataMapper<AuthorEntity, AuthorModel> DATA_MAPPER = new AuthorDataMapper();
+
+        public static final AuthorControllerMapper CONTROLLER_MAPPER = new AuthorControllerMapper();
 
         public static AuthorCreationRequestDto getValidCreationRequest() {
             return new AuthorCreationRequestDto("john.doe@gmail.com", "John", "Doe");
@@ -49,7 +54,7 @@ public abstract class Fixtures {
             return new BookCreationRequestDto("Berserk", Author.UUID);
         }
 
-        public static BookModel getTransientBookModel() {
+        public static BookModel getTransientModel() {
             var request = getValidCreationRequest();
             var authorModel = Author.getTransientModel();
             authorModel.setId(Author.UUID);

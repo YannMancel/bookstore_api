@@ -91,14 +91,14 @@ class AuthorPersistRepositoryTest {
     @Test
     void test1() {
         var request = Fixtures.Author.getValidCreationRequest();
-        var transientEntity = Fixtures.Author.MAPPER.toTransientEntity(request);
+        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(request);
 
-        var persistedAuthor = authorPersistRepository.save(transientEntity);
+        var persistedEntity = authorPersistRepository.save(transientEntity);
 
-        then(persistedAuthor)
+        then(persistedEntity)
                 .isNotNull()
                 .extracting(AuthorEntity::id)
-                .isNotNull();
+                    .isNotNull();
     }
 
     @DisplayName("""
@@ -119,9 +119,9 @@ class AuthorPersistRepositoryTest {
                 .hasMessageStartingWith("could not execute statement")
                 .hasMessageContaining(label)
                 .extracting(Throwable::getCause)
-                .isExactlyInstanceOf(JdbcSQLIntegrityConstraintViolationException.class)
-                .isInstanceOf(SQLException.class)
-                .isInstanceOf(Exception.class);
+                    .isExactlyInstanceOf(JdbcSQLIntegrityConstraintViolationException.class)
+                    .isInstanceOf(SQLException.class)
+                    .isInstanceOf(Exception.class);
     }
 
     @DisplayName("""
@@ -142,8 +142,8 @@ class AuthorPersistRepositoryTest {
                 .hasMessageStartingWith("could not execute statement")
                 .hasMessageContaining(label)
                 .extracting(Throwable::getCause)
-                .isExactlyInstanceOf(JdbcSQLDataException.class)
-                .isInstanceOf(SQLDataException.class)
-                .isInstanceOf(Exception.class);
+                    .isExactlyInstanceOf(JdbcSQLDataException.class)
+                    .isInstanceOf(SQLDataException.class)
+                    .isInstanceOf(Exception.class);
     }
 }

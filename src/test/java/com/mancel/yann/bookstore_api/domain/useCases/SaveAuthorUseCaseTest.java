@@ -8,7 +8,7 @@ import com.mancel.yann.bookstore_api.domain.exceptions.ValidationException;
 import com.mancel.yann.bookstore_api.domain.repositories.AuthorRepository;
 import com.mancel.yann.bookstore_api.domain.useCases.impl.SaveAuthorUseCase;
 import com.mancel.yann.bookstore_api.mocks.FakeTransactionDelegate;
-import com.mancel.yann.bookstore_api.mocks.MockInjectorTest;
+import com.mancel.yann.bookstore_api.mocks.MockInjector;
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 
 @SuppressWarnings("unchecked")
-class SaveAuthorUseCaseTest extends MockInjectorTest {
+class SaveAuthorUseCaseTest extends MockInjector {
 
     @Spy
     TransactionDelegate fakeTransactionDelegate = new FakeTransactionDelegate();
@@ -58,22 +58,22 @@ class SaveAuthorUseCaseTest extends MockInjectorTest {
             """)
     @Test
     void test1() {
-        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
-        var transientAuthor = Fixtures.Author.MAPPER.toTransientEntity(authorCreationRequest);
-        BDDMockito.given(mockedAuthorRepository.save(transientAuthor))
+        var request = Fixtures.Author.getValidCreationRequest();
+        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(request);
+        BDDMockito.given(mockedAuthorRepository.save(transientEntity))
                 .willReturn(Fixtures.Author.getPersistedEntity());
 
-        var persistedAuthor = saveAuthorUseCase.execute(transientAuthor);
+        var persistedEntity = saveAuthorUseCase.execute(transientEntity);
 
         BDDMockito.then(fakeTransactionDelegate)
                 .should()
                 .execute(any(Supplier.class));
         BDDMockito.then(mockedAuthorRepository)
                 .should()
-                .save(transientAuthor);
+                .save(transientEntity);
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
-        BDDAssertions.then(persistedAuthor)
+        BDDAssertions.then(persistedEntity)
                 .isEqualTo(Fixtures.Author.getPersistedEntity());
     }
 
@@ -109,20 +109,20 @@ class SaveAuthorUseCaseTest extends MockInjectorTest {
             """)
     @Test
     void test3() {
-        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
-        var transientAuthor = Fixtures.Author.MAPPER.toTransientEntity(authorCreationRequest);
+        var request = Fixtures.Author.getValidCreationRequest();
+        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(request);
         var exception = new UnknownException("foo", new Exception("bar"));
-        BDDMockito.given(mockedAuthorRepository.save(transientAuthor))
+        BDDMockito.given(mockedAuthorRepository.save(transientEntity))
                 .willThrow(exception);
 
-        var thrown = catchThrowable(() -> saveAuthorUseCase.execute(transientAuthor));
+        var thrown = catchThrowable(() -> saveAuthorUseCase.execute(transientEntity));
 
         BDDMockito.then(fakeTransactionDelegate)
                 .should()
                 .execute(any(Supplier.class));
         BDDMockito.then(mockedAuthorRepository)
                 .should()
-                .save(transientAuthor);
+                .save(transientEntity);
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
         BDDAssertions.then(thrown)

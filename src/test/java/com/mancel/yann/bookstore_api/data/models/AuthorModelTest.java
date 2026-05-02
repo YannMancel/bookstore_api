@@ -27,12 +27,12 @@ class AuthorModelTest {
             """)
     @Test
     void test1() {
-        var persistedAuthors = entityManager
+        var persistedModels = entityManager
                 .getEntityManager()
                 .createQuery("SELECT m FROM AuthorModel m", AuthorModel.class)
                 .getResultList();
 
-        then(persistedAuthors)
+        then(persistedModels)
                 .isNotNull()
                 .isEmpty();
     }
@@ -45,18 +45,18 @@ class AuthorModelTest {
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
     void test2() {
-        var persistedAuthors = entityManager
+        var persistedModels = entityManager
                 .getEntityManager()
                 .createQuery("SELECT m FROM AuthorModel m", AuthorModel.class)
                 .getResultList();
 
-        then(persistedAuthors)
+        then(persistedModels)
                 .isNotNull()
                 .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                .extracting(AuthorModel::getId)
-                .isEqualTo(Fixtures.Author.UUID);
+                    .extracting(AuthorModel::getId)
+                        .isEqualTo(Fixtures.Author.UUID);
     }
 
     @DisplayName("""
@@ -66,9 +66,9 @@ class AuthorModelTest {
             """)
     @Test
     void test3() {
-        var persistedAuthor = entityManager.find(AuthorModel.class, Fixtures.getRandomUUID());
+        var persistedModel = entityManager.find(AuthorModel.class, Fixtures.getRandomUUID());
 
-        then(persistedAuthor).isNull();
+        then(persistedModel).isNull();
     }
 
     @DisplayName("""
@@ -79,12 +79,12 @@ class AuthorModelTest {
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
     void test4() {
-        var persistedAuthor = entityManager.find(AuthorModel.class, Fixtures.Author.UUID);
+        var persistedModel = entityManager.find(AuthorModel.class, Fixtures.Author.UUID);
 
-        then(persistedAuthor)
+        then(persistedModel)
                 .isNotNull()
                 .extracting(AuthorModel::getId)
-                .isEqualTo(Fixtures.Author.UUID);
+                    .isEqualTo(Fixtures.Author.UUID);
     }
 
     @DisplayName("""
@@ -95,17 +95,17 @@ class AuthorModelTest {
             """)
     @Test
     void test5() {
-        var transientAuthor = Fixtures.Author.getTransientModel();
-        given(transientAuthor)
+        var transientModel = Fixtures.Author.getTransientModel();
+        given(transientModel)
                 .extracting(AuthorModel::getId)
-                .isNull();
+                    .isNull();
 
-        var persistedAuthor = entityManager.persist(transientAuthor);
+        var persistedModel = entityManager.persist(transientModel);
 
-        then(transientAuthor)
-                .isEqualTo(persistedAuthor)
-                .isEqualTo(entityManager.find(AuthorModel.class, persistedAuthor.getId()))
+        then(transientModel)
+                .isEqualTo(persistedModel)
+                .isEqualTo(entityManager.find(AuthorModel.class, persistedModel.getId()))
                 .extracting(AuthorModel::getId)
-                .isNotNull();
+                    .isNotNull();
     }
 }
