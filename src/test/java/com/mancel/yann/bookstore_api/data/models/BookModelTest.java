@@ -1,6 +1,7 @@
 package com.mancel.yann.bookstore_api.data.models;
 
 import com.mancel.yann.bookstore_api.Fixtures;
+import com.mancel.yann.bookstore_api.TestContainerInjector;
 import com.mancel.yann.bookstore_api.configuration.DataConfiguration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ import static org.assertj.core.api.BDDAssumptions.given;
 
 @DataJpaTest
 @ContextConfiguration(classes = DataConfiguration.class)
-class BookModelTest {
+class BookModelTest extends TestContainerInjector {
 
     @Autowired
     TestEntityManager entityManager;
