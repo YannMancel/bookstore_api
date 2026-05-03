@@ -1,12 +1,8 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:dev-database;DB_CLOSE_ON_EXIT=FALSE
-    username: yann
-    password: api
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     defer-datasource-initialization: false
     show-sql: true
     properties:
@@ -15,6 +11,4 @@ spring:
         highlight_sql: true
   sql:
     init:
-      mode: embedded
-  flyway:
-    enabled: false
+      mode: always

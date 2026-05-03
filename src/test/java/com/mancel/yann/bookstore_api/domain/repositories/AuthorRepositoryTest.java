@@ -1,6 +1,7 @@
 package com.mancel.yann.bookstore_api.domain.repositories;
 
 import com.mancel.yann.bookstore_api.Fixtures;
+import com.mancel.yann.bookstore_api.TestContainerInjector;
 import com.mancel.yann.bookstore_api.configuration.DataConfiguration;
 import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,7 @@ import static org.assertj.core.api.BDDAssumptions.givenCode;
 
 @DataJpaTest
 @ContextConfiguration(classes = DataConfiguration.class)
-class AuthorRepositoryTest {
+class AuthorRepositoryTest extends TestContainerInjector {
 
     @Autowired
     AuthorRepository authorRepository;
