@@ -8,23 +8,32 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(name = "authors")
+@Table(
+        name = "authors",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"email"}))
 public class AuthorModel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = AuthorEntity.EMAIL_LENGTH)
+    @Column(
+            nullable = false,
+            length = AuthorEntity.EMAIL_LENGTH)
     private String email;
 
-    @Column(name = "first_name", nullable = false, length = AuthorEntity.FIRST_NAME_LENGTH)
+    @Column(
+            name = "first_name",
+            nullable = false,
+            length = AuthorEntity.FIRST_NAME_LENGTH)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false, length = AuthorEntity.LAST_NAME_LENGTH)
+    @Column(name =
+            "last_name",
+            nullable = false,
+            length = AuthorEntity.LAST_NAME_LENGTH)
     private String lastName;
 
-    public AuthorModel() {
-    }
+    public AuthorModel() {}
 
     public static Builder getBuilder() {
         return new DefaultAuthorModelBuilder();
@@ -65,8 +74,11 @@ public class AuthorModel {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        AuthorModel author = (AuthorModel) o;
-        return Objects.equals(id, author.id) && Objects.equals(email, author.email) && Objects.equals(firstName, author.firstName) && Objects.equals(lastName, author.lastName);
+        AuthorModel authorModel = (AuthorModel) o;
+        return Objects.equals(id, authorModel.id) &&
+                Objects.equals(email, authorModel.email) &&
+                Objects.equals(firstName, authorModel.firstName) &&
+                Objects.equals(lastName, authorModel.lastName);
     }
 
     @Override

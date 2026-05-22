@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
-@EnableJpaRepositories(basePackages = "com.mancel.yann.bookstore_api.data.repositories")
+@EnableJpaRepositories("com.mancel.yann.bookstore_api.data.repositories")
 @EntityScan("com.mancel.yann.bookstore_api.data.models")
 public class DataConfiguration {
 
