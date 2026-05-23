@@ -1,8 +1,8 @@
 package com.mancel.yann.bookstore_api.data.mappers;
 
-public interface DataMapper<E, M> {
+public interface DataMapper<M, E> {
 
-    E toPersistedEntity(M persistedModel);
+    M toPersistedModel(E persistedEntity);
 
-    M toTransientModel(E transientEntity);
+    E toTransientEntity(M transientModel);
 }

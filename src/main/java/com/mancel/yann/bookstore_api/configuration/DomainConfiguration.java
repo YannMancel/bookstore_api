@@ -1,7 +1,7 @@
 package com.mancel.yann.bookstore_api.configuration;
 
 import com.mancel.yann.bookstore_api.domain.delegates.TransactionDelegate;
-import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.domain.models.AuthorModel;
 import com.mancel.yann.bookstore_api.domain.repositories.AuthorRepository;
 import com.mancel.yann.bookstore_api.domain.useCases.FindAllUseCase;
 import com.mancel.yann.bookstore_api.domain.useCases.FindByIdUseCase;
@@ -16,18 +16,18 @@ import org.springframework.context.annotation.Configuration;
 public class DomainConfiguration {
 
     @Bean
-    public SaveUseCase<AuthorEntity> createAuthorUseCase(TransactionDelegate transactionDelegate,
-                                                         AuthorRepository authorRepository) {
+    public SaveUseCase<AuthorModel> createAuthorUseCase(TransactionDelegate transactionDelegate,
+                                                        AuthorRepository authorRepository) {
         return new SaveAuthorUseCase(transactionDelegate, authorRepository);
     }
 
     @Bean
-    public FindAllUseCase<AuthorEntity> findAllAuthorsIdUseCase(AuthorRepository authorRepository) {
+    public FindAllUseCase<AuthorModel> findAllAuthorsIdUseCase(AuthorRepository authorRepository) {
         return new FindAllAuthorsUseCase(authorRepository);
     }
 
     @Bean
-    public FindByIdUseCase<AuthorEntity> findByAuthorIdUseCase(AuthorRepository authorRepository) {
+    public FindByIdUseCase<AuthorModel> findByAuthorIdUseCase(AuthorRepository authorRepository) {
         return new FindByAuthorIdUseCase(authorRepository);
     }
 }

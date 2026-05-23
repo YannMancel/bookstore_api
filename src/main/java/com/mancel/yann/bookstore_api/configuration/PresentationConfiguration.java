@@ -1,6 +1,6 @@
 package com.mancel.yann.bookstore_api.configuration;
 
-import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.domain.models.AuthorModel;
 import com.mancel.yann.bookstore_api.presentation.dto.requests.AuthorCreationRequestDto;
 import com.mancel.yann.bookstore_api.presentation.dto.responses.AuthorResponseDto;
 import com.mancel.yann.bookstore_api.presentation.mappers.AuthorControllerMapper;
@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class PresentationConfiguration {
 
     @Bean
-    public ControllerMapper<AuthorCreationRequestDto, AuthorEntity, AuthorResponseDto> authorControllerMapper() {
+    public ControllerMapper<AuthorCreationRequestDto, AuthorModel, AuthorResponseDto> authorControllerMapper() {
         return new AuthorControllerMapper();
     }
 }

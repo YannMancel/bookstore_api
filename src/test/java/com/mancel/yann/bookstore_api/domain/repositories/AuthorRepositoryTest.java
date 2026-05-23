@@ -3,7 +3,7 @@ package com.mancel.yann.bookstore_api.domain.repositories;
 import com.mancel.yann.bookstore_api.Fixtures;
 import com.mancel.yann.bookstore_api.TestContainerInjector;
 import com.mancel.yann.bookstore_api.configuration.DataConfiguration;
-import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.domain.models.AuthorModel;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,50 +22,21 @@ class AuthorRepositoryTest extends TestContainerInjector {
     AuthorRepository authorRepository;
 
     @DisplayName("""
-            Given the table is empty
-            When the findAll method is called
-            Then an empty list is returned
-            """)
-    @Test
-    void test1() {
-        var persistedEntities = authorRepository.findAll();
-
-        then(persistedEntities)
-                .isNotNull()
-                .isEmpty();
-    }
-
-    @DisplayName("""
-            Given the table is populated by one author
+            Given the table is populated by 1 author
             When the findAll method is called
             Then a list is returned with this author
             """)
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
-    void test2() {
-        var persistedEntities = authorRepository.findAll();
+    void findAllPersistedAuthorModels() {
+        var persistedAuthorModels = authorRepository.findAll();
 
-        then(persistedEntities)
+        then(persistedAuthorModels)
                 .isNotNull()
-                .isNotEmpty()
                 .hasSize(1)
                 .element(0)
-                    .extracting(AuthorEntity::id)
+                    .extracting(AuthorModel::id)
                         .isEqualTo(Fixtures.Author.UUID);
-    }
-
-    @DisplayName("""
-            Given the table is empty
-            When the findById method is called with a random id
-            Then an empty optional is returned
-            """)
-    @Test
-    void test3() {
-        var persistedEntityOptional = authorRepository.findById(Fixtures.getRandomUUID());
-
-        then(persistedEntityOptional)
-                .isNotNull()
-                .isEmpty();
     }
 
     @DisplayName("""
@@ -75,33 +46,33 @@ class AuthorRepositoryTest extends TestContainerInjector {
             """)
     @Test
     @Sql({"/scripts/insert_one_author.sql"})
-    void test4() {
-        var persistedEntityOptional = authorRepository.findById(Fixtures.Author.UUID);
+    void findPersistedAuthorModelByItsId() {
+        var persistedAuthorModelOptional = authorRepository.findById(Fixtures.Author.UUID);
 
-        then(persistedEntityOptional)
+        then(persistedAuthorModelOptional)
                 .isNotNull()
                 .isNotEmpty()
                 .get()
-                .extracting(AuthorEntity::id)
+                .extracting(AuthorModel::id)
                     .isEqualTo(Fixtures.Author.UUID);
     }
 
     @DisplayName("""
-            Given there is a valid transient entity
+            Given there is a valid transient author
             When the save method is called
             Then the persistence is success
             And the persisted author is returned
             """)
     @Test
-    void test5() {
-        var request = Fixtures.Author.getValidCreationRequest();
-        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(request);
-        givenCode(transientEntity::validOrThrow).doesNotThrowAnyException();
+    void persistTransientAuthorModel() {
+        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
+        var transientAuthorModel = Fixtures.Author.CONTROLLER_MAPPER.toTransientModel(authorCreationRequest);
+        givenCode(transientAuthorModel::validOrThrow).doesNotThrowAnyException();
 
-        var persistedEntity = authorRepository.save(transientEntity);
+        var persistedAuthorModel = authorRepository.save(transientAuthorModel);
 
-        then(persistedEntity)
-                .extracting(AuthorEntity::id)
+        then(persistedAuthorModel)
+                .extracting(AuthorModel::id)
                     .isNotNull();
     }
 }

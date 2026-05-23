@@ -1,6 +1,6 @@
 package com.mancel.yann.bookstore_api.presentation.controllers;
 
-import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.domain.models.AuthorModel;
 import com.mancel.yann.bookstore_api.domain.exceptions.EntityNotFoundException;
 import com.mancel.yann.bookstore_api.domain.exceptions.TransactionException;
 import com.mancel.yann.bookstore_api.domain.exceptions.ValidationException;
@@ -23,16 +23,16 @@ import java.util.UUID;
 @RequestMapping(path = "/v1/authors")
 public class AuthorController {
 
-    private final ControllerMapper<AuthorCreationRequestDto, AuthorEntity, AuthorResponseDto> authorControllerMapper;
-    private final FindAllUseCase<AuthorEntity> findAllUseCase;
-    private final FindByIdUseCase<AuthorEntity> findByIdUseCase;
-    private final SaveUseCase<AuthorEntity> saveUseCase;
+    private final ControllerMapper<AuthorCreationRequestDto, AuthorModel, AuthorResponseDto> authorControllerMapper;
+    private final FindAllUseCase<AuthorModel> findAllUseCase;
+    private final FindByIdUseCase<AuthorModel> findByIdUseCase;
+    private final SaveUseCase<AuthorModel> saveUseCase;
 
     public AuthorController(
-            ControllerMapper<AuthorCreationRequestDto, AuthorEntity, AuthorResponseDto> authorControllerMapper,
-            FindAllUseCase<AuthorEntity> findAllUseCase,
-            FindByIdUseCase<AuthorEntity> findByIdUseCase,
-            SaveUseCase<AuthorEntity> saveUseCase) {
+            ControllerMapper<AuthorCreationRequestDto, AuthorModel, AuthorResponseDto> authorControllerMapper,
+            FindAllUseCase<AuthorModel> findAllUseCase,
+            FindByIdUseCase<AuthorModel> findByIdUseCase,
+            SaveUseCase<AuthorModel> saveUseCase) {
         this.authorControllerMapper = authorControllerMapper;
         this.findAllUseCase = findAllUseCase;
         this.findByIdUseCase = findByIdUseCase;
@@ -72,17 +72,17 @@ public class AuthorController {
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<AuthorResponseDto> findById(@PathVariable UUID id) {
-        var entity = findByIdUseCase.execute(id);
-        var body = authorControllerMapper.toResponse(entity);
+        var authorModel = findByIdUseCase.execute(id);
+        var body = authorControllerMapper.toResponse(authorModel);
         return ResponseEntity.ok(body);
     }
 
     @PostMapping
     public ResponseEntity<AuthorResponseDto> saveByRequest(@RequestBody AuthorCreationRequestDto request) {
-        var transientEntity = authorControllerMapper.toTransientEntity(request);
-        var entity = saveUseCase.execute(transientEntity);
-        var body = authorControllerMapper.toResponse(entity);
-        var location = "/v1/authors/" + entity.id();
+        var transientAuthorModel = authorControllerMapper.toTransientModel(request);
+        var persistedAuthorModel = saveUseCase.execute(transientAuthorModel);
+        var body = authorControllerMapper.toResponse(persistedAuthorModel);
+        var location = "/v1/authors/" + persistedAuthorModel.id();
         return ResponseEntity
                 .created(URI.create(location))
                 .body(body);

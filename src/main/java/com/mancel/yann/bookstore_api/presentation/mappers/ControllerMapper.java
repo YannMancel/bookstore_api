@@ -1,7 +1,7 @@
 package com.mancel.yann.bookstore_api.presentation.mappers;
 
-public interface ControllerMapper<I, E, O> {
-    O toResponse(E entity);
+public interface ControllerMapper<I, M, O> {
+    O toResponse(M persistedModel);
 
-    E toTransientEntity(I request);
+    M toTransientModel(I request);
 }

@@ -3,7 +3,7 @@ package com.mancel.yann.bookstore_api.presentation.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mancel.yann.bookstore_api.Fixtures;
 import com.mancel.yann.bookstore_api.MvcResultTools;
-import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.domain.models.AuthorModel;
 import com.mancel.yann.bookstore_api.domain.exceptions.EntityNotFoundException;
 import com.mancel.yann.bookstore_api.domain.exceptions.TransactionException;
 import com.mancel.yann.bookstore_api.domain.exceptions.ValidationException;
@@ -41,16 +41,16 @@ class AuthorControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private ControllerMapper<AuthorCreationRequestDto, AuthorEntity, AuthorResponseDto> controllerMapper;
+    private ControllerMapper<AuthorCreationRequestDto, AuthorModel, AuthorResponseDto> controllerMapper;
 
     @MockitoBean
-    private FindAllUseCase<AuthorEntity> findAllUseCase;
+    private FindAllUseCase<AuthorModel> findAllUseCase;
 
     @MockitoBean
-    private FindByIdUseCase<AuthorEntity> findByIdUseCase;
+    private FindByIdUseCase<AuthorModel> findByIdUseCase;
 
     @MockitoBean
-    private SaveUseCase<AuthorEntity> saveUseCase;
+    private SaveUseCase<AuthorModel> saveUseCase;
 
     @DisplayName("""
             Given the findAll use case returns a list containing one author
@@ -59,17 +59,17 @@ class AuthorControllerTest {
             Then a list is returned with the author response
             """)
     @Test
-    void test1() throws Exception {
-        var persistedEntity = Fixtures.Author.getPersistedEntity();
-        var persistedEntities = List.of(persistedEntity);
-        var responses = persistedEntities
+    void findAllPersistedAuthorModels() throws Exception {
+        var persistedAuthorModel = Fixtures.Author.getPersistedModel();
+        var persistedAuthorModels = List.of(persistedAuthorModel);
+        var authorResponses = persistedAuthorModels
                 .stream()
                 .map(Fixtures.Author.CONTROLLER_MAPPER::toResponse)
                 .toList();
         given(findAllUseCase.execute())
-                .willReturn(persistedEntities);
-        given(controllerMapper.toResponse(persistedEntity))
-                .willReturn(Fixtures.Author.CONTROLLER_MAPPER.toResponse(persistedEntity));
+                .willReturn(persistedAuthorModels);
+        given(controllerMapper.toResponse(persistedAuthorModel))
+                .willReturn(Fixtures.Author.CONTROLLER_MAPPER.toResponse(persistedAuthorModel));
 
         var request = get("/v1/authors")
                 .contentType(MediaType.APPLICATION_JSON);
@@ -86,7 +86,7 @@ class AuthorControllerTest {
                         "is correct method")
                 .matches(mvcResult -> MvcResultTools.isStatus(mvcResult, HttpStatus.OK),
                         "is Ok")
-                .matches(mvcResult -> MvcResultTools.hasContent(mvcResult, objectMapper, responses),
+                .matches(mvcResult -> MvcResultTools.hasContent(mvcResult, objectMapper, authorResponses),
                         "has correct author responses");
     }
 
@@ -97,13 +97,13 @@ class AuthorControllerTest {
             Then the author response is returned
             """)
     @Test
-    void test2() throws Exception {
+    void findPersistedAuthorModelByItsId() throws Exception {
         var uuid = Fixtures.Author.UUID;
-        var persistedEntity = Fixtures.Author.getPersistedEntity();
-        var response = Fixtures.Author.CONTROLLER_MAPPER.toResponse(persistedEntity);
+        var persistedAuthorModel = Fixtures.Author.getPersistedModel();
+        var response = Fixtures.Author.CONTROLLER_MAPPER.toResponse(persistedAuthorModel);
         given(findByIdUseCase.execute(uuid))
-                .willReturn(persistedEntity);
-        given(controllerMapper.toResponse(persistedEntity))
+                .willReturn(persistedAuthorModel);
+        given(controllerMapper.toResponse(persistedAuthorModel))
                 .willReturn(response);
 
         var request = get("/v1/authors/{id}", uuid)
@@ -131,7 +131,7 @@ class AuthorControllerTest {
             Then the response is a 404 Not Found
             """)
     @Test
-    void test3() throws Exception {
+    void shouldBeA404NotFound() throws Exception {
         var uuid = Fixtures.getRandomUUID();
         var exception = new EntityNotFoundException("foo");
         given(findByIdUseCase.execute(uuid))
@@ -164,35 +164,35 @@ class AuthorControllerTest {
             Then the author response is returned
             """)
     @Test
-    void test4() throws Exception {
-        var creationRequest = Fixtures.Author.getValidCreationRequest();
-        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(creationRequest);
-        var persistedEntity = Fixtures.Author.getPersistedEntity();
-        var response = Fixtures.Author.CONTROLLER_MAPPER.toResponse(persistedEntity);
-        given(controllerMapper.toTransientEntity(creationRequest))
-                .willReturn(transientEntity);
-        given(saveUseCase.execute(transientEntity))
-                .willReturn(persistedEntity);
-        given(controllerMapper.toResponse(persistedEntity))
-                .willReturn(response);
+    void persistTransientAuthorModel() throws Exception {
+        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
+        var transientAuthorModel = Fixtures.Author.CONTROLLER_MAPPER.toTransientModel(authorCreationRequest);
+        var persistedAuthorModel = Fixtures.Author.getPersistedModel();
+        var authorResponse = Fixtures.Author.CONTROLLER_MAPPER.toResponse(persistedAuthorModel);
+        given(controllerMapper.toTransientModel(authorCreationRequest))
+                .willReturn(transientAuthorModel);
+        given(saveUseCase.execute(transientAuthorModel))
+                .willReturn(persistedAuthorModel);
+        given(controllerMapper.toResponse(persistedAuthorModel))
+                .willReturn(authorResponse);
 
         var request = post("/v1/authors")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(creationRequest));
+                .content(objectMapper.writeValueAsString(authorCreationRequest));
         var result = mockMvc.perform(request)
                 .andDo(print())
                 .andReturn();
 
         BDDMockito.then(saveUseCase)
                 .should()
-                .execute(transientEntity);
+                .execute(transientAuthorModel);
         BDDAssertions.then(result)
                 .isNotNull()
                 .matches(mvcResult -> MvcResultTools.isMethodName(mvcResult, "saveByRequest"),
                         "is correct method")
                 .matches(mvcResult -> MvcResultTools.isStatus(mvcResult, HttpStatus.CREATED),
                         "is CREATED")
-                .matches(mvcResult -> MvcResultTools.hasContent(mvcResult, objectMapper, response),
+                .matches(mvcResult -> MvcResultTools.hasContent(mvcResult, objectMapper, authorResponse),
                         "has correct author response");
     }
 
@@ -203,25 +203,25 @@ class AuthorControllerTest {
             Then the response is a 400 Bad Request
             """)
     @Test
-    void test5() throws Exception {
-        var creationRequest = Fixtures.Author.getValidCreationRequest();
-        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(creationRequest);
+    void shouldBeA400BadRequestForDomainException() throws Exception {
+        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
+        var transientAuthorModel = Fixtures.Author.CONTROLLER_MAPPER.toTransientModel(authorCreationRequest);
         var exception = new ValidationException("foo");
-        given(controllerMapper.toTransientEntity(creationRequest))
-                .willReturn(transientEntity);
-        given(saveUseCase.execute(transientEntity))
+        given(controllerMapper.toTransientModel(authorCreationRequest))
+                .willReturn(transientAuthorModel);
+        given(saveUseCase.execute(transientAuthorModel))
                 .willThrow(exception);
 
         var request = post("/v1/authors")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(creationRequest));
+                .content(objectMapper.writeValueAsString(authorCreationRequest));
         var result = mockMvc.perform(request)
                 .andDo(print())
                 .andReturn();
 
         BDDMockito.then(saveUseCase)
                 .should()
-                .execute(transientEntity);
+                .execute(transientAuthorModel);
         BDDAssertions.then(result)
                 .isNotNull()
                 .matches(mvcResult -> MvcResultTools.isMethodName(mvcResult, "saveByRequest"),
@@ -239,25 +239,25 @@ class AuthorControllerTest {
             Then the response is a 400 Bad Request
             """)
     @Test
-    void test6() throws Exception {
-        var creationRequest = Fixtures.Author.getValidCreationRequest();
-        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(creationRequest);
+    void shouldBeA400BadRequestFromTransactionException() throws Exception {
+        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
+        var transientAuthorModel = Fixtures.Author.CONTROLLER_MAPPER.toTransientModel(authorCreationRequest);
         var exception = new TransactionException("foo", new Exception());
-        given(controllerMapper.toTransientEntity(creationRequest))
-                .willReturn(transientEntity);
-        given(saveUseCase.execute(transientEntity))
+        given(controllerMapper.toTransientModel(authorCreationRequest))
+                .willReturn(transientAuthorModel);
+        given(saveUseCase.execute(transientAuthorModel))
                 .willThrow(exception);
 
         var request = post("/v1/authors")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(creationRequest));
+                .content(objectMapper.writeValueAsString(authorCreationRequest));
         var result = mockMvc.perform(request)
                 .andDo(print())
                 .andReturn();
 
         BDDMockito.then(saveUseCase)
                 .should()
-                .execute(transientEntity);
+                .execute(transientAuthorModel);
         BDDAssertions.then(result)
                 .isNotNull()
                 .matches(mvcResult -> MvcResultTools.isMethodName(mvcResult, "saveByRequest"),

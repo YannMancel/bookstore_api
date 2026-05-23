@@ -18,27 +18,28 @@ class JpaTransactionDelegateTest {
 
     @DisplayName("""
             Given there is a not throwing lambda
-            When the executeIntoTransaction method is called
+            When the execute method is called
             Then the correct result is returned
             """)
     @Test
-    void test1() {
+    void shouldReturnCorrectResult() {
         var uuid = Fixtures.getRandomUUID();
 
         var result = jpaTransactionDelegate.execute(() -> uuid);
 
-        then(result).isEqualTo(uuid);
+        then(result)
+                .isEqualTo(uuid);
     }
 
     @DisplayName("""
             Given there is a throwing lambda
             And the exception is not a DomainException
-            When the executeIntoTransaction method is called
+            When the execute method is called
             Then an UnknownException is thrown
             And its cause is the lambda's exception
             """)
     @Test
-    void test2() {
+    void shouldThrowsAnUnknownException() {
         var exception = new ArithmeticException();
         given(exception)
                 .isInstanceOf(Exception.class)
@@ -58,18 +59,20 @@ class JpaTransactionDelegateTest {
     @DisplayName("""
             Given there is a throwing lambda
             And the exception is a DomainException
-            When the executeIntoTransaction method is called
+            When the execute method is called
             Then this exception is rethrown
             """)
     @Test
-    void test3() {
+    void shouldThrowsAValidationException() {
         var exception = new ValidationException("");
-        given(exception).isInstanceOf(DomainException.class);
+        given(exception)
+                .isInstanceOf(DomainException.class);
 
         var thrown = catchThrowable(() -> jpaTransactionDelegate.execute(() -> {
             throw exception;
         }));
 
-        then(thrown).isExactlyInstanceOf(ValidationException.class);
+        then(thrown)
+                .isExactlyInstanceOf(ValidationException.class);
     }
 }

@@ -1,28 +1,28 @@
 package com.mancel.yann.bookstore_api.data.mappers;
 
-import com.mancel.yann.bookstore_api.data.models.AuthorModel;
-import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.data.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.domain.models.AuthorModel;
 import org.springframework.util.Assert;
 
-public class AuthorDataMapper implements DataMapper<AuthorEntity, AuthorModel> {
+public class AuthorDataMapper implements DataMapper<AuthorModel, AuthorEntity> {
 
     @Override
-    public AuthorEntity toPersistedEntity(AuthorModel persistedModel) {
-        Assert.notNull(persistedModel.getId(), "Persisted author's id must be not null.");
-        return new AuthorEntity(
-                persistedModel.getId(),
-                persistedModel.getEmail(),
-                persistedModel.getFirstName(),
-                persistedModel.getLastName());
+    public AuthorModel toPersistedModel(AuthorEntity persistedEntity) {
+        Assert.notNull(persistedEntity.getId(), "Persisted author entity's id must be not null.");
+        return new AuthorModel(
+                persistedEntity.getId(),
+                persistedEntity.getEmail(),
+                persistedEntity.getFirstName(),
+                persistedEntity.getLastName());
     }
 
     @Override
-    public AuthorModel toTransientModel(AuthorEntity transientEntity) {
-        Assert.isNull(transientEntity.id(), "Transient author's id must be null.");
-        return AuthorModel.getBuilder()
-                .setEmail(transientEntity.email())
-                .setFirstName(transientEntity.firstName())
-                .setLastName(transientEntity.lastName())
+    public AuthorEntity toTransientEntity(AuthorModel transientModel) {
+        Assert.isNull(transientModel.id(), "Transient author model's id must be null.");
+        return AuthorEntity.getBuilder()
+                .setEmail(transientModel.email())
+                .setFirstName(transientModel.firstName())
+                .setLastName(transientModel.lastName())
                 .build();
     }
 }
