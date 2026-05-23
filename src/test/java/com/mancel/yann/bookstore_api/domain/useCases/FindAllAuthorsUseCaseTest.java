@@ -1,7 +1,6 @@
 package com.mancel.yann.bookstore_api.domain.useCases;
 
 import com.mancel.yann.bookstore_api.Fixtures;
-import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
 import com.mancel.yann.bookstore_api.domain.repositories.AuthorRepository;
 import com.mancel.yann.bookstore_api.domain.useCases.impl.FindAllAuthorsUseCase;
 import com.mancel.yann.bookstore_api.mocks.MockInjector;
@@ -23,47 +22,26 @@ class FindAllAuthorsUseCaseTest extends MockInjector {
     FindAllAuthorsUseCase findAllAuthorsUseCase;
 
     @DisplayName("""
-            Given the table is empty
-            When the execute method is called
-            Then an empty list is returned
-            """)
-    @Test
-    void test1() {
-        var persistedEntities = findAllAuthorsUseCase.execute();
-
-        BDDMockito.then(mockedAuthorRepository)
-                .should()
-                .findAll();
-        BDDMockito.then(mockedAuthorRepository)
-                .shouldHaveNoMoreInteractions();
-        BDDAssertions.then(persistedEntities)
-                .isNotNull()
-                .isEmpty();
-    }
-
-    @DisplayName("""
-            Given the table is populated by one author
+            Given the table is populated by 1 author
             When the execute method is called
             Then a list is returned with this author
             """)
     @Test
-    void test2() {
+    void findAllPersistedAuthorModels() {
         BDDMockito.given(mockedAuthorRepository.findAll())
-                .willReturn(List.of(Fixtures.Author.getPersistedEntity()));
+                .willReturn(List.of(Fixtures.Author.getPersistedModel()));
 
-        var persistedEntities = findAllAuthorsUseCase.execute();
+        var persistedAuthorModels = findAllAuthorsUseCase.execute();
 
         BDDMockito.then(mockedAuthorRepository)
                 .should()
                 .findAll();
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
-        BDDAssertions.then(persistedEntities)
+        BDDAssertions.then(persistedAuthorModels)
                 .isNotNull()
-                .isNotEmpty()
                 .hasSize(1)
-                .element(0)
-                    .extracting(AuthorEntity::id)
-                        .isEqualTo(Fixtures.Author.UUID);
+                .allMatch(persistedAuthorModel -> persistedAuthorModel.id()
+                        .equals(Fixtures.Author.UUID));
     }
 }

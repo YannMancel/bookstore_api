@@ -1,7 +1,7 @@
 package com.mancel.yann.bookstore_api.presentation.mappers;
 
 import com.mancel.yann.bookstore_api.Fixtures;
-import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.domain.models.AuthorModel;
 import com.mancel.yann.bookstore_api.presentation.dto.responses.AuthorResponseDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,16 +13,16 @@ class AuthorControllerMapperTest {
 
     @DisplayName("Should convert persisted author to author response with success")
     @Test
-    void test1() {
-        var persistedEntity = Fixtures.Author.getPersistedEntity();
-        given(persistedEntity)
+    void convertAuthorModelToAuthorResponse() {
+        var persistedAuthorModel = Fixtures.Author.getPersistedModel();
+        given(persistedAuthorModel)
                 .isNotNull()
-                .extracting(AuthorEntity::id)
+                .extracting(AuthorModel::id)
                     .isNotNull();
 
-        var response = Fixtures.Author.CONTROLLER_MAPPER.toResponse(persistedEntity);
+        var authorResponse = Fixtures.Author.CONTROLLER_MAPPER.toResponse(persistedAuthorModel);
 
-        then(response)
+        then(authorResponse)
                 .isNotNull()
                 .extracting(AuthorResponseDto::id)
                     .isNotNull();
@@ -30,14 +30,14 @@ class AuthorControllerMapperTest {
 
     @DisplayName("Should convert author creation response to transient author with success")
     @Test
-    void test2() {
-        var request = Fixtures.Author.getValidCreationRequest();
+    void convertAuthorCreationRequestToTransientAuthorModel() {
+        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
 
-        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(request);
+        var transientAuthorModel = Fixtures.Author.CONTROLLER_MAPPER.toTransientModel(authorCreationRequest);
 
-        then(transientEntity)
+        then(transientAuthorModel)
                 .isNotNull()
-                .extracting(AuthorEntity::id)
+                .extracting(AuthorModel::id)
                     .isNull();
     }
 }

@@ -1,6 +1,6 @@
-package com.mancel.yann.bookstore_api.data.models;
+package com.mancel.yann.bookstore_api.data.entities;
 
-import com.mancel.yann.bookstore_api.data.models.builders.DefaultBookEntityBuilder;
+import com.mancel.yann.bookstore_api.data.entities.builders.DefaultBookEntityBuilder;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -25,7 +25,7 @@ public class BookEntity {
             name = "authors_books",
             joinColumns= @JoinColumn(name="book_id", referencedColumnName="id"),
             inverseJoinColumns= @JoinColumn(name="author_id", referencedColumnName="id"))
-    private Set<AuthorModel> authors = new HashSet<>();
+    private Set<AuthorEntity> authors = new HashSet<>();
 
     public BookEntity() {}
 
@@ -49,11 +49,11 @@ public class BookEntity {
         this.title = title;
     }
 
-    public Set<AuthorModel> getAuthors() {
+    public Set<AuthorEntity> getAuthors() {
         return authors;
     }
 
-    public void setAuthors(Set<AuthorModel> authors) {
+    public void setAuthors(Set<AuthorEntity> authors) {
         this.authors = authors;
     }
 
@@ -76,7 +76,7 @@ public class BookEntity {
 
         Builder setTitle(String title);
 
-        Builder setAuthors(Set<AuthorModel> authors);
+        Builder setAuthors(Set<AuthorEntity> authors);
 
         BookEntity build();
     }

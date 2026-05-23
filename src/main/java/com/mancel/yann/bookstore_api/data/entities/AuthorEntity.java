@@ -1,7 +1,7 @@
-package com.mancel.yann.bookstore_api.data.models;
+package com.mancel.yann.bookstore_api.data.entities;
 
-import com.mancel.yann.bookstore_api.data.models.builders.DefaultAuthorModelBuilder;
-import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.data.entities.builders.DefaultAuthorEntityBuilder;
+import com.mancel.yann.bookstore_api.domain.models.AuthorModel;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -11,32 +11,32 @@ import java.util.UUID;
 @Table(
         name = "authors",
         uniqueConstraints = @UniqueConstraint(columnNames = {"email"}))
-public class AuthorModel {
+public class AuthorEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(
             nullable = false,
-            length = AuthorEntity.EMAIL_LENGTH)
+            length = AuthorModel.EMAIL_LENGTH)
     private String email;
 
     @Column(
             name = "first_name",
             nullable = false,
-            length = AuthorEntity.FIRST_NAME_LENGTH)
+            length = AuthorModel.FIRST_NAME_LENGTH)
     private String firstName;
 
     @Column(name =
             "last_name",
             nullable = false,
-            length = AuthorEntity.LAST_NAME_LENGTH)
+            length = AuthorModel.LAST_NAME_LENGTH)
     private String lastName;
 
-    public AuthorModel() {}
+    public AuthorEntity() {}
 
     public static Builder getBuilder() {
-        return new DefaultAuthorModelBuilder();
+        return new DefaultAuthorEntityBuilder();
     }
 
     public UUID getId() {
@@ -74,11 +74,11 @@ public class AuthorModel {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        AuthorModel authorModel = (AuthorModel) o;
-        return Objects.equals(id, authorModel.id) &&
-                Objects.equals(email, authorModel.email) &&
-                Objects.equals(firstName, authorModel.firstName) &&
-                Objects.equals(lastName, authorModel.lastName);
+        AuthorEntity authorEntity = (AuthorEntity) o;
+        return Objects.equals(id, authorEntity.id) &&
+                Objects.equals(email, authorEntity.email) &&
+                Objects.equals(firstName, authorEntity.firstName) &&
+                Objects.equals(lastName, authorEntity.lastName);
     }
 
     @Override
@@ -95,6 +95,6 @@ public class AuthorModel {
 
         Builder setLastName(String lastName);
 
-        AuthorModel build();
+        AuthorEntity build();
     }
 }

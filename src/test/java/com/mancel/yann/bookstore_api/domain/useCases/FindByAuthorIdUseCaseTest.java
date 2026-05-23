@@ -1,7 +1,7 @@
 package com.mancel.yann.bookstore_api.domain.useCases;
 
 import com.mancel.yann.bookstore_api.Fixtures;
-import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.domain.models.AuthorModel;
 import com.mancel.yann.bookstore_api.domain.exceptions.EntityNotFoundException;
 import com.mancel.yann.bookstore_api.domain.repositories.AuthorRepository;
 import com.mancel.yann.bookstore_api.domain.useCases.impl.FindByAuthorIdUseCase;
@@ -27,26 +27,26 @@ class FindByAuthorIdUseCaseTest extends MockInjector {
     FindByAuthorIdUseCase findByAuthorIdUseCase;
 
     @DisplayName("""
-            Given the table is populated by one author
+            Given the table is populated by 1 author
             When the execute method is called
             Then the author is returned
             """)
     @Test
-    void test1() {
+    void findPersistedAuthorModelByItsId() {
         var uuid = Fixtures.Author.UUID;
         BDDMockito.given(mockedAuthorRepository.findById(uuid))
-                .willReturn(Optional.of(Fixtures.Author.getPersistedEntity()));
+                .willReturn(Optional.of(Fixtures.Author.getPersistedModel()));
 
-        var persistedEntity = findByAuthorIdUseCase.execute(uuid);
+        var persistedAuthorModel = findByAuthorIdUseCase.execute(uuid);
 
         BDDMockito.then(mockedAuthorRepository)
                 .should()
                 .findById(uuid);
         BDDMockito.then(mockedAuthorRepository)
                 .shouldHaveNoMoreInteractions();
-        BDDAssertions.then(persistedEntity)
+        BDDAssertions.then(persistedAuthorModel)
                 .isNotNull()
-                .extracting(AuthorEntity::id)
+                .extracting(AuthorModel::id)
                     .isEqualTo(Fixtures.Author.UUID);
     }
 
@@ -56,7 +56,7 @@ class FindByAuthorIdUseCaseTest extends MockInjector {
             Then an EntityNotFoundException is thrown
             """)
     @Test
-    void test2() {
+    void shouldThrowAnEntityNotFoundException() {
         var uuid = Fixtures.getRandomUUID();
 
         var thrown = catchThrowable(() -> findByAuthorIdUseCase.execute(uuid));

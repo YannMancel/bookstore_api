@@ -4,7 +4,7 @@ import com.mancel.yann.bookstore_api.Fixtures;
 import com.mancel.yann.bookstore_api.TestContainerInjector;
 import com.mancel.yann.bookstore_api.configuration.DataConfiguration;
 import com.mancel.yann.bookstore_api.data.repositories.AuthorPersistRepository;
-import com.mancel.yann.bookstore_api.domain.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.domain.models.AuthorModel;
 import net.bytebuddy.utility.RandomString;
 import org.hibernate.JDBCException;
 import org.hibernate.exception.ConstraintViolationException;
@@ -40,39 +40,39 @@ class AuthorPersistRepositoryTest extends TestContainerInjector {
     @Autowired
     private TestEntityManager testEntityManager;
 
-    static Stream<Arguments> transientEntityWithNullableFieldGenerator() {
+    static Stream<Arguments> transientAuthorModelWithNullableFieldGenerator() {
         return Stream.of(
                 arguments(
-                        new AuthorEntity(null, "John", "Doe"),
+                        new AuthorModel(null, "John", "Doe"),
                         "email"),
                 arguments(
-                        new AuthorEntity("john.doe@gmail.com", null, "Doe"),
+                        new AuthorModel("john.doe@gmail.com", null, "Doe"),
                         "first_name"),
                 arguments(
-                        new AuthorEntity("john.doe@gmail.com", "John", null),
+                        new AuthorModel("john.doe@gmail.com", "John", null),
                         "last_name"));
     }
 
-    static Stream<Arguments> transientEntityWithMoreThanMaxLengthGenerator() {
+    static Stream<Arguments> transientAuthorModelWithMoreThanMaxLengthGenerator() {
         return Stream.of(
                 arguments(
-                        new AuthorEntity(
-                                RandomString.make(AuthorEntity.EMAIL_LENGTH + 1),
+                        new AuthorModel(
+                                RandomString.make(AuthorModel.EMAIL_LENGTH + 1),
                                 "John",
                                 "Doe"),
-                        AuthorEntity.EMAIL_LENGTH),
+                        AuthorModel.EMAIL_LENGTH),
                 arguments(
-                        new AuthorEntity(
+                        new AuthorModel(
                                 "john.doe@gmail.com",
-                                RandomString.make(AuthorEntity.FIRST_NAME_LENGTH + 1),
+                                RandomString.make(AuthorModel.FIRST_NAME_LENGTH + 1),
                                 "Doe"),
-                        AuthorEntity.FIRST_NAME_LENGTH),
+                        AuthorModel.FIRST_NAME_LENGTH),
                 arguments(
-                        new AuthorEntity(
+                        new AuthorModel(
                                 "john.doe@gmail.com",
                                 "John",
-                                RandomString.make(AuthorEntity.LAST_NAME_LENGTH + 1)),
-                        AuthorEntity.LAST_NAME_LENGTH));
+                                RandomString.make(AuthorModel.LAST_NAME_LENGTH + 1)),
+                        AuthorModel.LAST_NAME_LENGTH));
     }
 
     @DisplayName("""
@@ -82,15 +82,15 @@ class AuthorPersistRepositoryTest extends TestContainerInjector {
             And the author is returned
             """)
     @Test
-    void test1() {
-        var request = Fixtures.Author.getValidCreationRequest();
-        var transientEntity = Fixtures.Author.CONTROLLER_MAPPER.toTransientEntity(request);
+    void persistTransientAuthorModel() {
+        var authorCreationRequest = Fixtures.Author.getValidCreationRequest();
+        var transientAuthorModel = Fixtures.Author.CONTROLLER_MAPPER.toTransientModel(authorCreationRequest);
 
-        var persistedEntity = authorPersistRepository.save(transientEntity);
+        var persistedAuthorModel = authorPersistRepository.save(transientAuthorModel);
 
-        then(persistedEntity)
+        then(persistedAuthorModel)
                 .isNotNull()
-                .extracting(AuthorEntity::id)
+                .extracting(AuthorModel::id)
                     .isNotNull();
     }
 
@@ -98,13 +98,18 @@ class AuthorPersistRepositoryTest extends TestContainerInjector {
             Given there is an invalid transient author
             When the save method is called
             Then the transaction is fail
-            And a ConstraintViolationException is thrown
+            And a PSQLException is thrown
             """)
     @ParameterizedTest
-    @MethodSource("transientEntityWithNullableFieldGenerator")
-    void test2(AuthorEntity transientEntity, String label) {
-        authorPersistRepository.save(transientEntity);
-        var thrown = catchThrowable(() -> testEntityManager.flush());
+    @MethodSource("transientAuthorModelWithNullableFieldGenerator")
+    void shouldThrowAnExceptionForANullableField(
+            AuthorModel transientAuthorModel,
+            String label
+    ) {
+        var thrown = catchThrowable(() -> {
+            authorPersistRepository.save(transientAuthorModel);
+            testEntityManager.flush();
+        });
 
         then(thrown)
                 .isExactlyInstanceOf(ConstraintViolationException.class)
@@ -121,13 +126,18 @@ class AuthorPersistRepositoryTest extends TestContainerInjector {
             Given there is an invalid transient author
             When the save method is called
             Then the transaction is fail
-            And a DataException is thrown
+            And a PSQLException is thrown
             """)
     @ParameterizedTest
-    @MethodSource("transientEntityWithMoreThanMaxLengthGenerator")
-    void test3(AuthorEntity transientEntity, int length) {
-        authorPersistRepository.save(transientEntity);
-        var thrown = catchThrowable(() -> testEntityManager.flush());
+    @MethodSource("transientAuthorModelWithMoreThanMaxLengthGenerator")
+    void shouldThrowAnExceptionForAFieldLengthConstraint(
+            AuthorModel transientAuthorModel,
+            int length
+    ) {
+        var thrown = catchThrowable(() -> {
+            authorPersistRepository.save(transientAuthorModel);
+            testEntityManager.flush();
+        });
 
         then(thrown)
                 .isExactlyInstanceOf(DataException.class)

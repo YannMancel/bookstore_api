@@ -1,4 +1,4 @@
-package com.mancel.yann.bookstore_api.data.models;
+package com.mancel.yann.bookstore_api.data.entities;
 
 import com.mancel.yann.bookstore_api.Fixtures;
 import com.mancel.yann.bookstore_api.TestContainerInjector;
@@ -45,7 +45,7 @@ class BookEntityTest extends TestContainerInjector {
                 .hasSize(2)
                 .allMatch(bookEntity -> bookEntity.getAuthors()
                         .stream()
-                        .anyMatch(authorModel ->  authorModel.getId()
+                        .anyMatch(authorEntity ->  authorEntity.getId()
                                 .equals(Fixtures.Author.UUID_FOR_MULTIPLE_BOOKS)));
     }
 
@@ -74,7 +74,7 @@ class BookEntityTest extends TestContainerInjector {
                 .hasSize(1)
                 .allMatch(bookEntity -> bookEntity.getAuthors()
                         .stream()
-                        .anyMatch(authorModel ->  authorModel.getId()
+                        .anyMatch(authorEntity ->  authorEntity.getId()
                                 .equals(Fixtures.Author.UUID_FOR_SINGLE_BOOK)));
     }
 
@@ -95,7 +95,7 @@ class BookEntityTest extends TestContainerInjector {
                                 "JOIN FETCH b.authors " +
                                 "WHERE b.title LIKE :pattern",
                         BookEntity.class)
-                .setParameter("pattern", MessageFormat.format("%{0}%", Fixtures.Book.TITLE))
+                .setParameter("pattern", MessageFormat.format("%{0}%", Fixtures.Book.SUBTITLE))
                 .getResultList();
 
         then(persistedBookEntities)

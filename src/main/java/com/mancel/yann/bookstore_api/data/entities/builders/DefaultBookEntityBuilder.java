@@ -1,7 +1,7 @@
-package com.mancel.yann.bookstore_api.data.models.builders;
+package com.mancel.yann.bookstore_api.data.entities.builders;
 
-import com.mancel.yann.bookstore_api.data.models.AuthorModel;
-import com.mancel.yann.bookstore_api.data.models.BookEntity;
+import com.mancel.yann.bookstore_api.data.entities.AuthorEntity;
+import com.mancel.yann.bookstore_api.data.entities.BookEntity;
 
 import java.util.Set;
 import java.util.UUID;
@@ -27,7 +27,7 @@ public class DefaultBookEntityBuilder implements BookEntity.Builder {
     }
 
     @Override
-    public BookEntity.Builder setAuthors(Set<AuthorModel> authors) {
+    public BookEntity.Builder setAuthors(Set<AuthorEntity> authors) {
         bookEntity.setAuthors(authors);
         return this;
     }
